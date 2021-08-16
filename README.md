@@ -25,6 +25,9 @@ That's it!
 
 Oh, one more thing, you can define an optional filter if you don't want some things to be saved.
 
+![neoclip](https://user-images.githubusercontent.com/23341710/129557093-7724e7eb-7427-4c53-aa98-55e624843589.png)
+
+
 ## Installation
 ```lua
 use {
