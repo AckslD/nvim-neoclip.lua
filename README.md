@@ -75,7 +75,7 @@ which will replace register `a`.
 The register `[0-9a-z]` and `default` (`"`) are supported.
 
 ## Tips
-* If you lazy load [`telescope`](https://github.com/nvim-telescope/telescope.nvim) with [`packer`](https://github.com/wbthomason/packer.nvim) with for example the key `module = telescope`, then it's better to use e.g. `:lua require('telescope').extensions.neoclip.neoclip()` than `:Telescope neoclip` for keybindings since it will properly load `telescope` before calling the extension.
+* If you lazy load [`telescope`](https://github.com/nvim-telescope/telescope.nvim) with [`packer`](https://github.com/wbthomason/packer.nvim) with for example the key `module = telescope`, then it's better to use e.g. `:lua require('telescope').extensions.neoclip.default()` than `:Telescope neoclip` (or `:lua require('telescope').extensions.neoclip['<reg>']()` over `:Telescope neoclip <reg>`) for keybindings since it will properly load `telescope` before calling the extension.
 
 ## Thanks
 * Thanks @cdown for the inspiration with [`clipmenu`](https://github.com/cdown/clipmenu).
