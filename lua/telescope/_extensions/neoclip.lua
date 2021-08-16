@@ -6,13 +6,14 @@ local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local entry_display = require "telescope.pickers.entry_display"
 
-local neoclip = require('neoclip')
+local handle_choice = require('neoclip.handlers').handle_choice
+local storage = require('neoclip.storage').get()
 
 local function get_handler(register_name)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
-        neoclip.handle_choice(register_name, entry)
+        handle_choice(register_name, entry)
     end
 end
 
@@ -47,18 +48,16 @@ local function get_export(register_name)
         pickers.new(opts, {
             prompt_title = string.format("Pick new entry for register '%s'", register_name),
             finder = finders.new_table({
-                results_maker = function()
-                    return neoclip.storage
-                end,
+                results = storage,
                 entry_maker = function(entry)
                     return {
                         display = make_display,
                         contents = entry.contents,
                         type = entry.type,
+                        ordinal = table.concat(entry.contents, '\n'),
                         -- TODO seem to be needed
                         name = 'name',
-                        value = 'value',
-                        ordinal = table.concat(entry.contents, '\n'),
+                        value = 'value', -- TODO what to put value to, affects sorting?
                     }
                 end,
             }),
