@@ -74,6 +74,12 @@ If you want to replace another register with an entry from the history you can d
 which will replace register `a`.
 The register `[0-9a-z]` and `default` (`"`) are supported.
 
+### Start/stop
+If you temporarily don't want `neoclip` to record anything you can use the following calls:
+* `:lua require('neoclip').start()`
+* `:lua require('neoclip').stop()`
+* `:lua require('neoclip').toggle()`
+
 ## Tips
 * If you lazy load [`telescope`](https://github.com/nvim-telescope/telescope.nvim) with [`packer`](https://github.com/wbthomason/packer.nvim) with for example the key `module = telescope`, then it's better to use e.g. `:lua require('telescope').extensions.neoclip()` than `:Telescope neoclip` for keybindings since it will properly load `telescope` before calling the extension.
 
