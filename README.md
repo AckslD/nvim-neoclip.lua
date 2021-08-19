@@ -83,6 +83,15 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
 ## Tips
 * If you lazy load [`telescope`](https://github.com/nvim-telescope/telescope.nvim) with [`packer`](https://github.com/wbthomason/packer.nvim) with for example the key `module = telescope`, then it's better to use e.g. `:lua require('telescope').extensions.neoclip.default()` than `:Telescope neoclip` (or `:lua require('telescope').extensions.neoclip['<reg>']()` over `:Telescope neoclip <reg>`) for keybindings since it will properly load `telescope` before calling the extension.
 
+## Troubleshooting
+* For some plugin managers it seems necessary to do
+  ```
+  :lua require('telescope').load_extension('neoclip')
+  ```
+  before being able to call `:Telescope neoclip` (packer does not seem to need this).
+  However, `:lua require('telescope').extensions.neoclip.default()` seems to work without having to load.
+* If using [`packer`](https://github.com/wbthomason/packer.nvim), don't forget to `PackerCompile` after adding the plugin.
+
 ## Thanks
 * Thanks @cdown for the inspiration with [`clipmenu`](https://github.com/cdown/clipmenu).
 * Thanks @fdschmidt93 for help understanding some [`telescope`](https://github.com/nvim-telescope/telescope.nvim) concepts.
