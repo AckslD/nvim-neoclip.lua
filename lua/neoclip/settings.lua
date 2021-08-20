@@ -3,6 +3,7 @@ local M = {}
 local settings = {
     history = 1000,
     filter = nil,
+    preview = true,
 }
 
 M.get = function()
