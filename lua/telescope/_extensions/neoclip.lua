@@ -22,7 +22,7 @@ end
 local displayer = entry_display.create {
     separator = " ",
     items = {
-        { width = 65 },
+        { width = 60 },
         { remaining = true },
     },
 }
@@ -33,31 +33,27 @@ local spec_per_regtype = {
     b = 'blockwise',
 }
 
-local function make_display(entry)
+local function spec_from_entry(entry)
     local spec = spec_per_regtype[entry.regtype]
     local num_lines = #entry.contents
     if num_lines > 1 then
         spec = string.format('%s (%d lines)', spec, num_lines)
     end
-    return displayer {
-        entry.contents[1],
-        {spec, "Comment"},
-    }
+    return spec
 end
 
-local function preview_command(entry, bufnr)
-    vim.api.nvim_buf_call(bufnr, function()
-        vim.api.nvim_buf_set_lines(bufnr, 0, -1, true, entry.contents)
-        print(entry.filetype)
-        vim.bo.filetype = entry.filetype
-    end)
+local function make_display(entry)
+    local to_display = {entry.contents[1]}
+    if settings.content_spec_column then
+        table.insert(to_display, {spec_from_entry(entry), "Comment"})
+    end
+    return displayer(to_display)
 end
 
 local function entry_maker(entry)
     return {
         display = make_display,
         contents = entry.contents,
-        preview_command = preview_command,
         regtype = entry.regtype,
         filetype = entry.filetype,
         ordinal = table.concat(entry.contents, '\n'),
@@ -71,7 +67,17 @@ local function get_export(register_name)
     return function(opts)
         local previewer = false
         if settings.preview then
-            previewer = previewers.display_content.new({})
+            previewer = previewers.new_buffer_previewer({
+                define_preview = function(self, entry, status)
+                    vim.api.nvim_buf_call(self.state.bufnr, function()
+                        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, true, entry.contents)
+                        vim.bo.filetype = entry.filetype
+                    end)
+                end,
+                dyn_title = function(self, entry)
+                    return spec_from_entry(entry)
+                end
+            })
         end
         pickers.new(opts, {
             prompt_title = string.format("Pick new entry for register '%s'", register_name),
