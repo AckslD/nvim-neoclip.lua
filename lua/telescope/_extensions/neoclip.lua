@@ -7,15 +7,25 @@ local action_state = require("telescope.actions.state")
 local entry_display = require "telescope.pickers.entry_display"
 local previewers = require('telescope.previewers')
 
-local handle_choice = require('neoclip.handlers').handle_choice
+local handlers = require('neoclip.handlers')
 local storage = require('neoclip.storage').get()
 local settings = require('neoclip.settings').get()
 
-local function get_handler(register_name)
+local function get_set_register_handler(register_name)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
-        handle_choice(register_name, entry)
+        handlers.set_register(register_name, entry)
+    end
+end
+
+local function get_paste_handler(register_name, op)
+    return function(prompt_bufnr)
+        local entry = action_state.get_selected_entry()
+        -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
+        -- and have it optional
+        actions.close(prompt_bufnr)
+        handlers.paste(register_name, entry, op)
     end
 end
 
@@ -86,8 +96,11 @@ local function get_export(register_name)
             previewer = previewer,
             sorter = config.generic_sorter(opts),
             attach_mappings = function(_, map)
-                map('i', '<cr>', get_handler(register_name))
-                map('n', '<cr>', get_handler(register_name))
+                for _, mode in ipairs({'i', 'n'}) do
+                    map(mode, settings.keys[mode].select, get_set_register_handler(register_name))
+                    map(mode, settings.keys[mode].paste, get_paste_handler(register_name, 'p'))
+                    map(mode, settings.keys[mode].paste_behind, get_paste_handler(register_name, 'P'))
+                end
                 return true
             end,
         }):find()

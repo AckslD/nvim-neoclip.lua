@@ -41,8 +41,23 @@ M.handle_yank_post = function()
     end
 end
 
-M.handle_choice = function(register_name, entry)
+M.set_register = function(register_name, entry)
     vim.fn.setreg(register_name, entry.contents, entry.regtype)
+end
+
+M.paste = function(register_name, entry, op)
+    local current_contents
+    local current_regtype
+    if not settings.on_paste.set_reg then
+        current_contents = vim.fn.getreg(register_name)
+        current_regtype = vim.fn.getregtype(register_name)
+    end
+    M.set_register(register_name, entry)
+    -- TODO can this be done without setting the register (if on_paste.set_reg is false)
+    vim.cmd(string.format('normal! "%s%s', register_name, op))
+    if not settings.on_paste.set_reg then
+        vim.fn.setreg(register_name, current_contents, current_regtype)
+    end
 end
 
 return M
