@@ -109,6 +109,12 @@ If you want to replace another register with an entry from the history you can d
 which will replace register `a`.
 The register `[0-9a-z]` and `default` (`"`) are supported.
 
+The following special registers are support:
+* `"`: `Telescope neoclip unnamed`
+* `*`: `Telescope neoclip star`
+* `+`: `Telescope neoclip plus`
+and `Telescope neoclip` (and `Telescope neoclip default`) will use what you set `default_register` in the `setup`.
+
 ### Start/stop
 If you temporarily don't want `neoclip` to record anything you can use the following calls:
 * `:lua require('neoclip').start()`
