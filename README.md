@@ -113,6 +113,7 @@ The following special registers are support:
 * `"`: `Telescope neoclip unnamed`
 * `*`: `Telescope neoclip star`
 * `+`: `Telescope neoclip plus`
+
 and `Telescope neoclip` (and `Telescope neoclip default`) will use what you set `default_register` in the `setup`.
 
 ### Start/stop
