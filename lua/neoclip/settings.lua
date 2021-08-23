@@ -5,19 +5,42 @@ local settings = {
     filter = nil,
     preview = true,
     content_spec_column = false,
+    on_paste = {
+        set_reg = false,
+    },
+    keys = {
+        i = {
+            select = '<cr>',
+            paste = '<c-p>',
+            paste_behind = '<c-k>',
+        },
+        n = {
+            select = '<cr>',
+            paste = 'p',
+            paste_behind = 'P',
+        },
+    },
 }
 
 M.get = function()
     return settings
 end
 
-M.setup = function(opts)
+local function setup(opts, subsettings)
     if opts == nil then
         opts = {}
     end
     for key, value in pairs(opts) do
-        settings[key] = value
+        if type(subsettings[key]) == 'table' then
+            setup(value, subsettings[key])
+        else
+            subsettings[key] = value
+        end
     end
+end
+
+M.setup = function(opts)
+    setup(opts, settings)
 end
 
 return M

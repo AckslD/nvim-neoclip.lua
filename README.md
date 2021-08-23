@@ -40,32 +40,52 @@ use {
 When `require('neoclip').setup()` is called, only the autocommand (for `TextYankPost` event) is setup to save yanked things. This means that `telescope` is not required at this point if you lazy load it.
 
 ## Configuration
-You can configure `neoclip` by passing a table to `setup`. The following are the defaults and the keys are explained below:
+You can configure `neoclip` by passing a table to `setup` (all are optional).
+The following are the defaults and the keys are explained below:
 ```lua
 use {
-    "AckslD/nvim-neoclip.lua",
-    config = function()
-        require('neoclip').setup({
-            history = 1000,
-            filter = nil,
-            preview = true,
-            content_spec_column = false,
-        })
-    end,
+  "AckslD/nvim-neoclip.lua",
+  config = function()
+    require('neoclip').setup({
+      history = 1000,
+      filter = nil,
+      preview = true,
+      content_spec_column = false,
+      on_paste = {
+        set_reg = false,
+      },
+      keys = {
+        i = {
+          select = '<cr>',
+          paste = '<c-p>',
+          paste_behind = '<c-k>',
+        },
+        n = {
+          select = '<cr>',
+          paste = 'p',
+          paste_behind = 'P',
+        },
+      },
+    })
+  end,
 }
 ```
-* `history` (optional): The max number of entries to store (default 1000).
-* `filter` (optional): A function to filter what entries to store (default all are stored).
+* `history`: The max number of entries to store (default 1000).
+* `filter`: A function to filter what entries to store (default all are stored).
   This function filter should return `true` (include the yanked entry) or `false` (don't include it) based on a table as the only argument, which has the following keys:
   * `event`: The event from `TextYankPost` (see `:help TextYankPost` for which keys it contains).
   * `filetype`: The filetype of the buffer where the yank happened.
   * `buffer_name`: The name of the buffer where the yank happened.
-* `preview` (optional): Whether to show a preview (default) of the current entry or not.
+* `preview`: Whether to show a preview (default) of the current entry or not.
   Useful for for example multiline yanks.
   When yanking the filetype is recorded in order to enable correct syntax highlighting in the preview.
   NOTE: in order to use the dynamic title showing the type of content and number of lines you need to configure `telescope` with the `dynamic_preview_title = true` option.
-* `content_spec_colunm` (optional): Can be set to `true` (default `false`) to use instead of the preview.
+* `content_spec_colunm`: Can be set to `true` (default `false`) to use instead of the preview.
   It will only show the type and number of lines next to the first line of the entry.
+* `on_paste`:
+  * `set_reg`: if the register when pressing the key to paste directly.
+* `keys`: keys to use for the different actions in insert `i` and normal mode `n`.
+  NOTE: these are only set in the `telescope` buffer and you need to setup your own keybindings to for example open `telescope`.
 
 See screenshot section below for how the settings above might affect the looks.
 
@@ -75,7 +95,10 @@ Yank all you want and then do:
 :Telescope neoclip
 ```
 which will show you a history of the yanks that happened in the current session.
-If you pick one this will then replace the current `"` (unnamed) register.
+If you pick (default `<cr>`) one this will then replace the current `"` (unnamed) register.
+
+If you instead want to directly paste it you can press by default `<c-p>` in insert mode and `p` in normal.
+Paste behind is by default `<c-k>` and `P` respectively.
 
 If you want to replace another register with an entry from the history you can do for example:
 ```vim
