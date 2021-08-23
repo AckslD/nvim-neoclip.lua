@@ -10,7 +10,7 @@ end
 
 M.insert = function(contents)
     if #storage >= settings.history then
-        table.remove(M.storage, -1)
+        table.remove(storage, #storage)
     end
     table.insert(storage, 1, contents)
 end
