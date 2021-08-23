@@ -17,7 +17,7 @@ local function should_add(event)
     end
 end
 
-local function get_type(regtype)
+local function get_regtype(regtype)
     if regtype == 'v' then
         return 'c'
     elseif regtype == 'V' then
@@ -34,14 +34,15 @@ M.handle_yank_post = function()
     local event = vim.v.event
     if should_add(event) then
         storage.insert({
-            type = get_type(event.regtype),
+            regtype = get_regtype(event.regtype),
             contents = event.regcontents,
+            filetype = vim.bo.filetype,
         })
     end
 end
 
 M.handle_choice = function(register_name, entry)
-    vim.fn.setreg(register_name, entry.contents, entry.type)
+    vim.fn.setreg(register_name, entry.contents, entry.regtype)
 end
 
 return M

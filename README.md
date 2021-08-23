@@ -48,6 +48,8 @@ use {
         require('neoclip').setup({
             history = 1000,
             filter = nil,
+            preview = true,
+            content_spec_column = false,
         })
     end,
 }
@@ -58,6 +60,14 @@ use {
   * `event`: The event from `TextYankPost` (see `:help TextYankPost` for which keys it contains).
   * `filetype`: The filetype of the buffer where the yank happened.
   * `buffer_name`: The name of the buffer where the yank happened.
+* `preview` (optional): Whether to show a preview (default) of the current entry or not.
+  Useful for for example multiline yanks.
+  When yanking the filetype is recorded in order to enable correct syntax highlighting in the preview.
+  NOTE: in order to use the dynamic title showing the type of content and number of lines you need to configure `telescope` with the `dynamic_preview_title = true` option.
+* `content_spec_colunm` (optional): Can be set to `true` (default `false`) to use instead of the preview.
+  It will only show the type and number of lines next to the first line of the entry.
+
+See screenshot section below for how the settings above might affect the looks.
 
 ## Usage
 Yank all you want and then do:
@@ -95,3 +105,10 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
 ## Thanks
 * Thanks @cdown for the inspiration with [`clipmenu`](https://github.com/cdown/clipmenu).
 * Thanks @fdschmidt93 for help understanding some [`telescope`](https://github.com/nvim-telescope/telescope.nvim) concepts.
+
+## Screenshots
+### `preview = true` and `content_spec_column = false`
+
+### `preview = false` and `content_spec_column = true`
+
+### `preview = false` and `content_spec_column = false`
