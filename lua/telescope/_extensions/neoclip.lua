@@ -69,10 +69,8 @@ local function get_export(register_name)
         if settings.preview then
             previewer = previewers.new_buffer_previewer({
                 define_preview = function(self, entry, status)
-                    vim.api.nvim_buf_call(self.state.bufnr, function()
-                        vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, true, entry.contents)
-                        vim.bo.filetype = entry.filetype
-                    end)
+                    vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, true, entry.contents)
+                    vim.bo[self.state.bufnr].filetype = entry.filetype
                 end,
                 dyn_title = function(self, entry)
                     return spec_from_entry(entry)
