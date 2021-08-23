@@ -4,6 +4,7 @@ local settings = {
     history = 1000,
     filter = nil,
     preview = true,
+    default_register = '"',
     content_spec_column = false,
     on_paste = {
         set_reg = false,

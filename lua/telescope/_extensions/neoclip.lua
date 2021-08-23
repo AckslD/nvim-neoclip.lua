@@ -107,26 +107,36 @@ local function get_export(register_name)
     end
 end
 
+local special_registers = {
+    ['"'] = 'unnamed',
+    ['*'] = 'star',
+    ['+'] = 'plus',
+}
+
 local function register_names()
-    local names = {'"'}
+    local names = {}
+    for reg, name in pairs(special_registers) do
+        names[reg] = name
+    end
     for i = 1, 9 do -- [0-9]
-        table.insert(names, string.format('%d', i))
+        local reg = string.format('%d', i)
+        names[reg] = reg
     end
     for c = 97, 122 do -- [a-z]
-        table.insert(names, string.char(c))
+        local reg = string.char(c)
+        names[reg] = reg
     end
     return names
 end
 
 local function get_exports()
     local exports = {}
-    for _, register_name in ipairs(register_names()) do
-        local export = get_export(register_name)
-        if register_name == '"' then
+    for reg, name in pairs(register_names()) do
+        local export = get_export(reg)
+        exports[name] = export
+        if reg == settings.default_register then
             exports['default'] = export
             exports['neoclip'] = export
-        else
-            exports[register_name] = export
         end
     end
     return exports

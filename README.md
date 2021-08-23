@@ -50,6 +50,7 @@ use {
       history = 1000,
       filter = nil,
       preview = true,
+      default_register = '"',
       content_spec_column = false,
       on_paste = {
         set_reg = false,
@@ -80,6 +81,7 @@ use {
   Useful for for example multiline yanks.
   When yanking the filetype is recorded in order to enable correct syntax highlighting in the preview.
   NOTE: in order to use the dynamic title showing the type of content and number of lines you need to configure `telescope` with the `dynamic_preview_title = true` option.
+* `default_register`: What register to by default when not specifying (e.g. `Telescope neoclip`).
 * `content_spec_colunm`: Can be set to `true` (default `false`) to use instead of the preview.
   It will only show the type and number of lines next to the first line of the entry.
 * `on_paste`:
