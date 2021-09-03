@@ -2,6 +2,7 @@ local M = {}
 
 local settings = {
     history = 1000,
+    db_path = nil,
     filter = nil,
     preview = true,
     default_register = '"',

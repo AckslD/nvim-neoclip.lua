@@ -41,6 +41,10 @@ M.handle_yank_post = function()
     end
 end
 
+M.on_exit = function()
+    storage.on_exit()
+end
+
 M.set_register = function(register_name, entry)
     vim.fn.setreg(register_name, entry.contents, entry.regtype)
 end
