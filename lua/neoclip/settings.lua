@@ -2,7 +2,8 @@ local M = {}
 
 local settings = {
     history = 1000,
-    db_path = nil,
+    enable_persistant_history = false,
+    db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
     filter = nil,
     preview = true,
     default_register = '"',
