@@ -9,7 +9,7 @@ local function should_add(event)
         local data = {
             event = event,
             filetype = vim.bo.filetype,
-            buffer_name = vim.api.but_get_name(0),
+            buffer_name = vim.api.buf_get_name(0),
         }
         return settings.filter(data)
     else
