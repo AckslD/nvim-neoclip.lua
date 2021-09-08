@@ -11,21 +11,30 @@ local handlers = require('neoclip.handlers')
 local storage = require('neoclip.storage').get()
 local settings = require('neoclip.settings').get()
 
-local function get_set_register_handler(register_name)
-    return function(prompt_bufnr)
-        local entry = action_state.get_selected_entry()
-        actions.close(prompt_bufnr)
+local function set_registers(register_names, entry)
+    for _, register_name in ipairs(register_names) do
         handlers.set_register(register_name, entry)
     end
 end
 
-local function get_paste_handler(register_name, op)
+local function get_set_register_handler(register_names)
+    return function(prompt_bufnr)
+        local entry = action_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        set_registers(register_names, entry)
+    end
+end
+
+local function get_paste_handler(register_names, op)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
         actions.close(prompt_bufnr)
-        handlers.paste(register_name, entry, op)
+        if settings.on_paste.set_reg then
+            set_registers(register_names, entry)
+        end
+        handlers.paste(entry, op)
     end
 end
 
@@ -73,7 +82,39 @@ local function entry_maker(entry)
     }
 end
 
-local function get_export(register_name)
+local function join(t1, t2)
+    local new_t = {}
+    for _, e in ipairs(t1) do
+        table.insert(new_t, e)
+    end
+    for _, e in ipairs(t2) do
+        table.insert(new_t, e)
+    end
+    return new_t
+end
+
+local special_registers = {
+    unnamed = '"',
+    star = '*',
+    plus = '+',
+}
+
+local function parse_extra(extra)
+    local registers = {}
+    for _, r in ipairs(vim.fn.split(extra, ',')) do
+        if special_registers[r] == nil then
+            table.insert(registers, r)
+        else
+            table.insert(registers, special_registers[r])
+        end
+    end
+    return registers
+end
+
+local function get_export(register_names)
+    if type(register_names) == 'string' then
+        register_names = {register_names}
+    end
     return function(opts)
         local previewer = false
         if settings.preview then
@@ -87,8 +128,11 @@ local function get_export(register_name)
                 end
             })
         end
+        if opts ~= nil and opts.extra ~= nil then
+            register_names = join(register_names, parse_extra(opts.extra))
+        end
         pickers.new(opts, {
-            prompt_title = string.format("Pick new entry for register '%s'", register_name),
+            prompt_title = string.format("Pick new entry for registers %s", table.concat(register_names, ',')),
             finder = finders.new_table({
                 results = storage,
                 entry_maker = entry_maker,
@@ -97,9 +141,9 @@ local function get_export(register_name)
             sorter = config.generic_sorter(opts),
             attach_mappings = function(_, map)
                 for _, mode in ipairs({'i', 'n'}) do
-                    map(mode, settings.keys[mode].select, get_set_register_handler(register_name))
-                    map(mode, settings.keys[mode].paste, get_paste_handler(register_name, 'p'))
-                    map(mode, settings.keys[mode].paste_behind, get_paste_handler(register_name, 'P'))
+                    map(mode, settings.keys[mode].select, get_set_register_handler(register_names))
+                    map(mode, settings.keys[mode].paste, get_paste_handler(register_names, 'p'))
+                    map(mode, settings.keys[mode].paste_behind, get_paste_handler(register_names, 'P'))
                 end
                 return true
             end,
@@ -107,15 +151,9 @@ local function get_export(register_name)
     end
 end
 
-local special_registers = {
-    ['"'] = 'unnamed',
-    ['*'] = 'star',
-    ['+'] = 'plus',
-}
-
 local function register_names()
     local names = {}
-    for reg, name in pairs(special_registers) do
+    for name, reg in pairs(special_registers) do
         names[reg] = name
     end
     for i = 1, 9 do -- [0-9]
@@ -134,11 +172,10 @@ local function get_exports()
     for reg, name in pairs(register_names()) do
         local export = get_export(reg)
         exports[name] = export
-        if reg == settings.default_register then
-            exports['default'] = export
-            exports['neoclip'] = export
-        end
     end
+    local default = get_export(settings.default_register)
+    exports['default'] = default
+    exports['neoclip'] = default
     return exports
 end
 
