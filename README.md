@@ -82,6 +82,7 @@ use {
   When yanking the filetype is recorded in order to enable correct syntax highlighting in the preview.
   NOTE: in order to use the dynamic title showing the type of content and number of lines you need to configure `telescope` with the `dynamic_preview_title = true` option.
 * `default_register`: What register to by default when not specifying (e.g. `Telescope neoclip`).
+  Can be a string such as `'"'` (single register) or a table of strings such as `{'"', '+', '*'}`.
 * `content_spec_colunm`: Can be set to `true` (default `false`) to use instead of the preview.
   It will only show the type and number of lines next to the first line of the entry.
 * `on_paste`:
@@ -115,6 +116,12 @@ The following special registers are support:
 * `+`: `Telescope neoclip plus`
 
 and `Telescope neoclip` (and `Telescope neoclip default`) will use what you set `default_register` in the `setup`.
+
+You can also specify more registers to populate in a single command with the `extra` keyword argument which
+supports registers separated by comma, for example:
+```vim
+:Telescope neoclip a extra=star,plus,b
+```
 
 ### Start/stop
 If you temporarily don't want `neoclip` to record anything you can use the following calls:
