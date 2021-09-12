@@ -10,6 +10,7 @@ local previewers = require('telescope.previewers')
 local handlers = require('neoclip.handlers')
 local storage = require('neoclip.storage').get()
 local settings = require('neoclip.settings').get()
+local utils = require('neoclip.utils')
 
 local function set_registers(register_names, entry)
     for _, register_name in ipairs(register_names) do
@@ -82,17 +83,6 @@ local function entry_maker(entry)
     }
 end
 
-local function join(t1, t2)
-    local new_t = {}
-    for _, e in ipairs(t1) do
-        table.insert(new_t, e)
-    end
-    for _, e in ipairs(t2) do
-        table.insert(new_t, e)
-    end
-    return new_t
-end
-
 local special_registers = {
     unnamed = '"',
     star = '*',
@@ -129,7 +119,7 @@ local function get_export(register_names)
             })
         end
         if opts ~= nil and opts.extra ~= nil then
-            register_names = join(register_names, parse_extra(opts.extra))
+            register_names = utils.join(register_names, parse_extra(opts.extra))
         end
         pickers.new(opts, {
             prompt_title = string.format("Pick new entry for registers %s", table.concat(register_names, ',')),
