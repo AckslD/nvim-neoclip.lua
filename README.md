@@ -23,7 +23,7 @@ You can then select an entry in the history using [`telescope`](https://github.c
 
 That's it!
 
-Oh, one more thing, you can define an optional filter if you don't want some things to be saved.
+Oh, some more things, you can define an optional filter if you don't want some things to be saved and custom actions to take.
 
 Hold on, `neoclip` optionally also supports persistent history between sessions powered by [`sqlite.lua`](https://github.com/tami5/sqlite.lua).
 
@@ -75,11 +75,13 @@ use {
           select = '<cr>',
           paste = '<c-p>',
           paste_behind = '<c-k>',
+          custom = {},
         },
         n = {
           select = '<cr>',
           paste = 'p',
           paste_behind = 'P',
+          custom = {},
         },
       },
     })
@@ -106,9 +108,66 @@ use {
 * `on_paste`:
   * `set_reg`: if the register when pressing the key to paste directly.
 * `keys`: keys to use for the different actions in insert `i` and normal mode `n`.
+  You can also use the `custom` entry to specify custom actions to take on certain key-presses, see [below](#custom-actions) for more details.
   NOTE: these are only set in the `telescope` buffer and you need to setup your own keybindings to for example open `telescope`.
 
 See screenshot section below for how the settings above might affect the looks.
+
+### Custom actions
+You can specify custom actions in the `keys` entry in the settings.
+For example you can do:
+```lua
+require('neoclip').setup({
+  ...
+  keys = {
+    ...
+    n = {
+      ...
+      custom = {
+        ['<space>'] = function(opts)
+          print(vim.inspect(opts))
+        end,
+      },
+    },
+  },
+})
+```
+which when pressing `<space>` in normal mode will print something like:
+```
+{
+  register_names = { '"' },
+  entry = {
+    contents = { "which when pressing `<space>` in normal mode will print something like:" },
+    filetype = "markdown",
+    regtype = "l"
+  }
+}
+```
+to do your custom action and also populate a register and/or paste you can call `neoclip`s built-in handlers, such as:
+```lua
+require('neoclip').setup({
+  ...
+  keys = {
+    ...
+    n = {
+      ...
+      custom = {
+        ['<space>'] = function(opts)
+          -- do your stuff
+          -- ...
+          local handlers = require('neoclip.handlers')
+          -- optionally set the registers with the entry
+          -- handlers.set_registers(opts.register_names, opts.entry)
+          -- optionally paste entry
+          -- handlers.paste(opts.entry, 'p')
+          -- optionally paste entry behind
+          -- handlers.paste(opts.entry, 'P')
+        end,
+      },
+    },
+  },
+})
+```
 
 ## Usage
 Yank all you want and then do:
