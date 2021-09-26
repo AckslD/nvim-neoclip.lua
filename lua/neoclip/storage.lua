@@ -12,7 +12,7 @@ M.get = function()
 end
 
 M.insert = function(contents)
-    if #storage >= settings.history then
+    while #storage >= settings.history do
         table.remove(storage, #storage)
     end
     table.insert(storage, 1, contents)
@@ -20,7 +20,7 @@ end
 
 M.clear = function()
     while #storage > 0 do
-        table.remove(M.storage, 1)
+        table.remove(storage, 1)
     end
 end
 
