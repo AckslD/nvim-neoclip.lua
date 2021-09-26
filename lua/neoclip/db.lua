@@ -1,3 +1,5 @@
+local settings = require('neoclip.settings').get()
+
 local M = {}
 
 local has_sqlite, sqlite = pcall(require, "sqlite")
@@ -14,19 +16,21 @@ local function make_db_dir(db_path)
     os.execute('mkdir -p ' .. dirname(db_path))
 end
 
-local function get_db(db_path)
+local function get_tbl()
+    local db_path = settings.db_path
     make_db_dir(db_path)
     local db = sqlite.new(db_path)
     db:open()
-    db:create('neoclip', {
-        id = true,
-        ensure = true,
-        regtype = 'text',
-        contents = 'luatable',
-        filetype = 'text',
+    local tbl = db:tbl("neoclip", {
+        regtype = "text",
+        contents = "luatable",
+        filetype = "text",
     })
-    return db
+
+    return tbl
 end
+
+M.tbl = get_tbl()
 
 local function copy(t)
     local new = {}
@@ -40,15 +44,25 @@ local function copy(t)
     return new
 end
 
-M.get = function(db_path)
-    local db = get_db(db_path)
-    return db:select('neoclip')
+M.get = function(query)
+    local success, entries = pcall(M.tbl.get, M.tbl, query)
+    if success then
+        return entries
+    else
+        print("Couldn't load history since:", entries)
+        return {}
+    end
 end
 
-M.update = function(opts)
-    local db = get_db(opts.db_path)
-    db:delete('neoclip')
-    db:insert('neoclip', opts.storage)
+M.update = function(storage)
+    local success, msg = pcall(M.tbl.remove, M.tbl)
+    if not success then
+        print("Couldn't remove clear database since:", msg)
+    end
+    success, msg = pcall(M.tbl.insert, M.tbl, storage)
+    if not success then
+        print("Couldn't insert in database since:", msg)
+    end
 end
 
 return M

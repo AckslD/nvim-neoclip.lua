@@ -4,7 +4,7 @@ local settings = require('neoclip.settings').get()
 
 local storage = {}
 if settings.enable_persistant_history then
-    storage = require('neoclip.db').get(settings.db_path)
+    storage = require('neoclip.db').get()
 end
 
 M.get = function()
@@ -26,10 +26,7 @@ end
 
 M.on_exit = function()
     if settings.enable_persistant_history then
-        require('neoclip.db').update({
-            db_path = settings.db_path,
-            storage = storage,
-        })
+        require('neoclip.db').update(storage)
     end
 end
 
