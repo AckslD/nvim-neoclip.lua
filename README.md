@@ -25,19 +25,32 @@ That's it!
 
 Oh, one more thing, you can define an optional filter if you don't want some things to be saved.
 
+Hold on, `neoclip` optionally also supports persistent history between sessions powered by [`sqlite.lua`](https://github.com/tami5/sqlite.lua).
+
 ![neoclip](https://user-images.githubusercontent.com/23341710/129557093-7724e7eb-7427-4c53-aa98-55e624843589.png)
 
 
 ## Installation
 ```lua
 use {
-    "AckslD/nvim-neoclip.lua",
-    config = function()
-        require('neoclip').setup()
-    end,
+  "AckslD/nvim-neoclip.lua",
+  config = function()
+    require('neoclip').setup()
+  end,
 }
 ```
 When `require('neoclip').setup()` is called, only the autocommand (for `TextYankPost` event) is setup to save yanked things. This means that `telescope` is not required at this point if you lazy load it.
+
+If you want to use persistent history between sessions you also need [`sqlite.lua`](https://github.com/tami5/sqlite.lua) installed, for example by:
+```lua
+use {
+  "AckslD/nvim-neoclip.lua",
+  requires = {'tami5/sqlite.lua', module = 'sqlite'},
+  config = function()
+    require('neoclip').setup()
+  end,
+}
+```
 
 ## Configuration
 You can configure `neoclip` by passing a table to `setup` (all are optional).
@@ -48,6 +61,8 @@ use {
   config = function()
     require('neoclip').setup({
       history = 1000,
+      enable_persistant_history = false,
+      db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
       filter = nil,
       preview = true,
       default_register = '"',
@@ -72,6 +87,9 @@ use {
 }
 ```
 * `history`: The max number of entries to store (default 1000).
+* `enable_persistant_history`: If set to `true` the history is stored on `VimLeavePre` using [`sqlite.lua`](https://github.com/tami5/sqlite.lua) and lazy loaded when querying.
+* `db_path`: The path to the sqlite database to store history if `enable_persistant_history=true`.
+  Defaults to `vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3` which on my system is `~/.local/share/nvim/databases/neoclip.sqlite3`
 * `filter`: A function to filter what entries to store (default all are stored).
   This function filter should return `true` (include the yanked entry) or `false` (don't include it) based on a table as the only argument, which has the following keys:
   * `event`: The event from `TextYankPost` (see `:help TextYankPost` for which keys it contains).
