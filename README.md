@@ -224,7 +224,10 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
 
 ## Screenshots
 ### `preview = true` and `content_spec_column = false`
+![preview](https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png)
 
 ### `preview = false` and `content_spec_column = true`
+![content_spec_column](https://user-images.githubusercontent.com/23341710/140090472-3271affa-7efd-40bd-9d20-562b2074b261.png)
 
 ### `preview = false` and `content_spec_column = false`
+![clean](https://user-images.githubusercontent.com/23341710/140090327-30bfff28-83ff-4695-82b8-8d4abfd68546.png)
