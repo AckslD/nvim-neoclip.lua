@@ -1,19 +1,19 @@
-*nvim-neoclip.lua.txt*               neoclip is a clipboard manager for neovim
+*neoclip.txt*                        neoclip is a clipboard manager for neovim
 
 ==============================================================================
-Table of Contents                         *nvim-neoclip.lua-table-of-contents*
+Table of Contents                                  *neoclip-table-of-contents*
 
-1. nvim-neoclip.lua                        |nvim-neoclip.lua-nvim-neoclip.lua|
-  - Installation                               |nvim-neoclip.lua-installation|
-  - Configuration                             |nvim-neoclip.lua-configuration|
-  - Usage                                             |nvim-neoclip.lua-usage|
-  - Tips                                               |nvim-neoclip.lua-tips|
-  - Troubleshooting                         |nvim-neoclip.lua-troubleshooting|
-  - Thanks                                           |nvim-neoclip.lua-thanks|
-  - Screenshots                                 |nvim-neoclip.lua-screenshots|
+1. nvim-neoclip.lua                                 |neoclip-nvim-neoclip.lua|
+  - Installation                                        |neoclip-installation|
+  - Configuration                                      |neoclip-configuration|
+  - Usage                                                      |neoclip-usage|
+  - Tips                                                        |neoclip-tips|
+  - Troubleshooting                                  |neoclip-troubleshooting|
+  - Thanks                                                    |neoclip-thanks|
+  - Screenshots                                          |neoclip-screenshots|
 
 ==============================================================================
-1. nvim-neoclip.lua                        *nvim-neoclip.lua-nvim-neoclip.lua*
+1. nvim-neoclip.lua                                 *neoclip-nvim-neoclip.lua*
 
 _This is a story about Bob_ 👷.
 
@@ -54,7 +54,7 @@ powered by `sqlite.lua` <https://github.com/tami5/sqlite.lua>.
 <p class="caption">neoclip</p>
 </div>
 
-INSTALLATION                                   *nvim-neoclip.lua-installation*
+INSTALLATION                                            *neoclip-installation*
 
 >
     use {
@@ -84,7 +84,7 @@ If you want to use persistent history between sessions you also need
 <
 
 
-CONFIGURATION                                 *nvim-neoclip.lua-configuration*
+CONFIGURATION                                          *neoclip-configuration*
 
 You can configure `neoclip` by passing a table to `setup` (all are optional).
 The following are the defaults and the keys are explained below:
@@ -145,7 +145,7 @@ The following are the defaults and the keys are explained below:
 - `on_paste`:
     - `set_reg`: if the register when pressing the key to paste directly.
 - `keys`: keys to use for the different actions in insert `i` and normal mode `n`.
-    You can also use the `custom` entry to specify custom actions to take on certain key-presses, see |nvim-neoclip.lua-below| for more details.
+    You can also use the `custom` entry to specify custom actions to take on certain key-presses, see |neoclip-below| for more details.
     NOTE: these are only set in the `telescope` buffer and you need to setup your own keybindings to for example open `telescope`.
 
 
@@ -217,7 +217,7 @@ to do your custom action and also populate a register and/or paste you can call
 <
 
 
-USAGE                                                 *nvim-neoclip.lua-usage*
+USAGE                                                          *neoclip-usage*
 
 Yank all you want and then do:
 
@@ -266,13 +266,13 @@ If you temporarily don’t want `neoclip` to record anything you can use the
 following calls: * `:lua require('neoclip').start()` * `:lua
 require('neoclip').stop()` * `:lua require('neoclip').toggle()`
 
-TIPS                                                   *nvim-neoclip.lua-tips*
+TIPS                                                            *neoclip-tips*
 
 
 - If you lazy load `telescope` <https://github.com/nvim-telescope/telescope.nvim> with `packer` <https://github.com/wbthomason/packer.nvim> with for example the key `module = telescope`, then it’s better to use e.g. `:lua require('telescope').extensions.neoclip.default()` than `:Telescope neoclip` (or `:lua require('telescope').extensions.neoclip['<reg>']()` over `:Telescope neoclip <reg>`) for keybindings since it will properly load `telescope` before calling the extension.
 
 
-TROUBLESHOOTING                             *nvim-neoclip.lua-troubleshooting*
+TROUBLESHOOTING                                      *neoclip-troubleshooting*
 
 
 - For some plugin managers it seems necessary to do
@@ -286,14 +286,14 @@ TROUBLESHOOTING                             *nvim-neoclip.lua-troubleshooting*
     to `PackerCompile` after adding the plugin.
 
 
-THANKS                                               *nvim-neoclip.lua-thanks*
+THANKS                                                        *neoclip-thanks*
 
 
 - Thanks cdow for the inspiration with `clipmenu` <https://github.com/cdown/clipmenu>.
 - Thanks fdschmidt9 for help understanding some `telescope` <https://github.com/nvim-telescope/telescope.nvim> concepts.
 
 
-SCREENSHOTS                                     *nvim-neoclip.lua-screenshots*
+SCREENSHOTS                                              *neoclip-screenshots*
 
 `PREVIEW = TRUE` AND `CONTENT_SPEC_COLUMN = FALSE` ~
 
