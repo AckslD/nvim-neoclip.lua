@@ -50,7 +50,7 @@ Hold on, `neoclip` optionally also supports persistent history between sessions
 powered by `sqlite.lua` <https://github.com/tami5/sqlite.lua>.
 
 <div class="figure">
-<img src="https://user-images.githubusercontent.com/23341710/129557093-7724e7eb-7427-4c53-aa98-55e624843589.png" title="fig:"/>
+<img src="https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png" title="fig:"/>
 <p class="caption">neoclip</p>
 </div>
 
