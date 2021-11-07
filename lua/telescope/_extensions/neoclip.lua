@@ -11,6 +11,7 @@ local handlers = require('neoclip.handlers')
 local storage = require('neoclip.storage').get()
 local settings = require('neoclip.settings').get()
 local utils = require('neoclip.utils')
+local picker_utils = require('neoclip.picker_utils')
 
 local function get_set_register_handler(register_names)
     return function(prompt_bufnr)
@@ -137,7 +138,7 @@ local function get_export(register_names)
             register_names = utils.join(register_names, parse_extra(opts.extra))
         end
         pickers.new(opts, {
-            prompt_title = string.format("Pick new entry for registers %s", table.concat(register_names, ',')),
+            prompt_title = picker_utils.make_prompt_title(register_names),
             finder = finders.new_table({
                 results = storage,
                 entry_maker = entry_maker,
