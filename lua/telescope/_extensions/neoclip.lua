@@ -147,7 +147,7 @@ local function get_export(register_names)
             sorter = config.generic_sorter(opts),
             attach_mappings = function(_, map)
                 for _, mode in ipairs({'i', 'n'}) do
-                    local keys = settings.keys[mode]
+                    local keys = settings.keys.telescope[mode]
                     map_if_set(map, mode, keys.select, get_set_register_handler(register_names))
                     map_if_set(map, mode, keys.paste, get_paste_handler(register_names, 'p'))
                     map_if_set(map, mode, keys.paste_behind, get_paste_handler(register_names, 'P'))

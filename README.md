@@ -19,7 +19,7 @@ _Don't be like Bob, use neoclip!_ 🎉
 
 `neoclip` is a clipboard manager for neovim inspired by for example [`clipmenu`](https://github.com/cdown/clipmenu).
 It records everything that gets yanked in your vim session (up to a limit which is by default 1000 entries but can be configured).
-You can then select an entry in the history using [`telescope`](https://github.com/nvim-telescope/telescope.nvim) which then gets populated in a register of your choice.
+You can then select an entry in the history using [`telescope`](https://github.com/nvim-telescope/telescope.nvim) or [`fzf-lua`](https://github.com/ibhagwan/fzf-lua) which then gets populated in a register of your choice.
 
 That's it!
 
@@ -33,6 +33,11 @@ Hold on, `neoclip` optionally also supports persistent history between sessions 
 ```lua
 use {
   "AckslD/nvim-neoclip.lua",
+  requires = {
+    -- you'll need at least one of these
+    -- {'nvim-telescope/telescope.nvim'},
+    -- {'ibhagwan/fzf-lua'},
+  }
   config = function()
     require('neoclip').setup()
   end,
@@ -44,7 +49,12 @@ If you want to use persistent history between sessions you also need [`sqlite.lu
 ```lua
 use {
   "AckslD/nvim-neoclip.lua",
-  requires = {'tami5/sqlite.lua', module = 'sqlite'},
+  requires = {
+    {'tami5/sqlite.lua', module = 'sqlite'},
+    -- you'll need at least one of these
+    -- {'nvim-telescope/telescope.nvim'},
+    -- {'ibhagwan/fzf-lua'},
+  }
   config = function()
     require('neoclip').setup()
   end,
@@ -70,16 +80,24 @@ use {
         set_reg = false,
       },
       keys = {
-        i = {
-          select = '<cr>',
-          paste = '<c-p>',
-          paste_behind = '<c-k>',
-          custom = {},
+        telescope = {
+          i = {
+            select = '<cr>',
+            paste = '<c-p>',
+            paste_behind = '<c-k>',
+            custom = {},
+          },
+          n = {
+            select = '<cr>',
+            paste = 'p',
+            paste_behind = 'P',
+            custom = {},
+          },
         },
-        n = {
-          select = '<cr>',
-          paste = 'p',
-          paste_behind = 'P',
+        fzf = {
+          select = 'default',
+          paste = 'ctrl-p',
+          paste_behind = 'ctrl-k',
           custom = {},
         },
       },
@@ -106,7 +124,9 @@ use {
   It will only show the type and number of lines next to the first line of the entry.
 * `on_paste`:
   * `set_reg`: if the register when pressing the key to paste directly.
-* `keys`: keys to use for the different actions in insert `i` and normal mode `n`.
+* `keys`: keys to use for the different pickers (`telescope` and `fzf-lua`).
+  With `telescope` normal key-syntax is supported and both insert `i` and normal mode `n`.
+  With `fzf-lua` only insert mode is supported and `fzf`-style key-syntax needs to be used.
   You can also use the `custom` entry to specify custom actions to take on certain key-presses, see [below](#custom-actions) for more details.
   NOTE: these are only set in the `telescope` buffer and you need to setup your own keybindings to for example open `telescope`.
 
@@ -173,7 +193,11 @@ Yank all you want and then do:
 ```vim
 :Telescope neoclip
 ```
-which will show you a history of the yanks that happened in the current session.
+if using `telescope` or
+```vim
+:lua require('neoclip.fzf')()
+```
+if using `fzf-lua`, which will show you a history of the yanks that happened in the current session.
 If you pick (default `<cr>`) one this will then replace the current `"` (unnamed) register.
 
 If you instead want to directly paste it you can press by default `<c-p>` in insert mode and `p` in normal.
@@ -183,7 +207,11 @@ If you want to replace another register with an entry from the history you can d
 ```vim
 :Telescope neoclip a
 ```
-which will replace register `a`.
+if using `telescope` or
+```vim
+:lua require('neoclip.fzf')('a')
+```
+if using `fzf-lua`, which will replace register `a`.
 The register `[0-9a-z]` and `default` (`"`) are supported.
 
 The following special registers are support:
@@ -198,6 +226,11 @@ supports registers separated by comma, for example:
 ```vim
 :Telescope neoclip a extra=star,plus,b
 ```
+if using `telescope` or
+```vim
+:lua require('neoclip.fzf')({'a', 'star', 'plus', 'b'})
+```
+if using `fzf-lua`.
 
 ### Start/stop
 If you temporarily don't want `neoclip` to record anything you can use the following calls:
@@ -220,6 +253,7 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
 ## Thanks
 * Thanks @cdown for the inspiration with [`clipmenu`](https://github.com/cdown/clipmenu).
 * Thanks @fdschmidt93 for help understanding some [`telescope`](https://github.com/nvim-telescope/telescope.nvim) concepts.
+* Thanks @ibhagwan for providing the code example to support [`fzf-lua`](https://github.com/ibhagwan/fzf-lua).
 
 ## Screenshots
 ### `preview = true` and `content_spec_column = false`

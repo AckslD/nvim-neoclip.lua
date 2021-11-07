@@ -1,5 +1,3 @@
-local M = {}
-
 local handlers = require('neoclip.handlers')
 local storage = require('neoclip.storage').get()
 local settings = require('neoclip.settings').get()
@@ -43,8 +41,7 @@ local function get_custom_action_handler(register_names, action)
 end
 
 local function make_actions(register_names)
-    local mode = 'i'  -- NOTE for fzf only insert is used (true?)
-    local keys = settings.keys[mode]
+    local keys = settings.keys['fzf']
     local actions = {
         [keys.select] = get_set_register_handler(register_names),
         [keys.paste] = get_paste_handler(register_names, 'p'),
@@ -82,7 +79,7 @@ local fn = function(fzf_cb)
     fzf_cb(nil)
 end
 
-function M.neoclip(register_names)
+local function neoclip(register_names)
     if register_names == nil then
         register_names = settings.default_register
     end
@@ -106,6 +103,4 @@ function M.neoclip(register_names)
     end)()
 end
 
-M.neoclip()
-
-return M
+return neoclip
