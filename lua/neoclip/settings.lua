@@ -47,7 +47,7 @@ local function check_keys()
     local keys = settings.keys
     if keys.i ~= nil or keys.n ~= nil then
         -- TODO check PR number
-        warn('Using settings.keys without specifying \'telescope\' or \'fzf\' will not be supported in the future, see #27.')
+        warn('Using settings.keys without specifying \'telescope\' or \'fzf\' will not be supported in the future, see #29.')
         keys.telescope = keys
     end
 end
