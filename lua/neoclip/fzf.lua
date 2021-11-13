@@ -4,7 +4,7 @@ local settings = require('neoclip.settings').get()
 local picker_utils = require('neoclip.picker_utils')
 
 local function get_idx(item)
-    return tonumber(item:match("^[(%d+)]"))
+    return tonumber(item:match("^%d+%."))
 end
 
 local function parse_entry(entry_str)
@@ -113,7 +113,7 @@ local function neoclip(register_names)
     coroutine.wrap(function()
         local selected = require('fzf-lua').fzf({
             prompt = picker_utils.make_prompt_title(register_names),
-            preview = Previewer,
+            previewer = Previewer,
             actions = actions,
             fzf_opts = {
                 ["--delimiter"] = '.',
