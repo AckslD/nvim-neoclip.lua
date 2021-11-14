@@ -112,14 +112,15 @@ local function neoclip(register_names)
     local actions = make_actions(register_names)
     coroutine.wrap(function()
         local selected = require('fzf-lua').fzf({
-            prompt = picker_utils.make_prompt_title(register_names),
+            prompt = 'Prompt❯ ',
             previewer = Previewer,
             actions = actions,
             fzf_opts = {
-                ["--delimiter"] = '.',
+                ["--header"] = vim.fn.shellescape(picker_utils.make_prompt_title(register_names)),
+                ["--delimiter"] = [[\\.]],
                 -- comment `--nth` if you want to enable
                 -- fuzzy matching the index number
-                ["--nth"] = '3..',
+                ["--with-nth"] = '2..',
             },
         }, fn)
         require('fzf-lua').actions.act(actions, selected, {})
