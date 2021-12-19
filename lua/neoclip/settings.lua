@@ -12,16 +12,24 @@ local settings = {
         set_reg = false,
     },
     keys = {
-        i = {
-            select = '<cr>',
-            paste = '<c-p>',
-            paste_behind = '<c-k>',
-            custom = {},
+        telescope = {
+            i = {
+                select = '<cr>',
+                paste = '<c-p>',
+                paste_behind = '<c-k>',
+                custom = {},
+            },
+            n = {
+                select = '<cr>',
+                paste = 'p',
+                paste_behind = 'P',
+                custom = {},
+            },
         },
-        n = {
-            select = '<cr>',
-            paste = 'p',
-            paste_behind = 'P',
+        fzf = {
+            select = 'default',
+            paste = 'ctrl-p',
+            paste_behind = 'ctrl-k',
             custom = {},
         },
     },
@@ -29,6 +37,19 @@ local settings = {
 
 M.get = function()
     return settings
+end
+
+local function warn(msg)
+    vim.cmd(string.format('echohl WarningMsg | echo "Warning: %s" | echohl None', msg))
+end
+
+local function check_keys()
+    local keys = settings.keys
+    if keys.i ~= nil or keys.n ~= nil then
+        -- TODO check PR number
+        warn('Using settings.keys without specifying \'telescope\' or \'fzf\' will not be supported in the future, see #29.')
+        keys.telescope = keys
+    end
 end
 
 local function setup(opts, subsettings)
@@ -42,6 +63,7 @@ local function setup(opts, subsettings)
             subsettings[key] = value
         end
     end
+    check_keys()
 end
 
 M.setup = function(opts)
