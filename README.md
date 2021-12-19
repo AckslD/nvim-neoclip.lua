@@ -249,6 +249,9 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
   before being able to call `:Telescope neoclip` (packer does not seem to need this).
   However, `:lua require('telescope').extensions.neoclip.default()` seems to work without having to load.
 * If using [`packer`](https://github.com/wbthomason/packer.nvim), don't forget to `PackerCompile` after adding the plugin.
+* If using [`vim-plug`](https://github.com/junegunn/vim-plug), there seems to be some issue with the (optional) persistent history.
+  See [here](https://github.com/AckslD/nvim-neoclip.lua/issues/32#issuecomment-986065850) for relevant discussion.
+  If you find out what is causing this, I'd be very happy to know :)
 
 ## Thanks
 * Thanks @cdown for the inspiration with [`clipmenu`](https://github.com/cdown/clipmenu).
