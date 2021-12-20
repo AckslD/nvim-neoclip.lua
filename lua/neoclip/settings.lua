@@ -40,7 +40,7 @@ M.get = function()
 end
 
 local function warn(msg)
-    vim.cmd(string.format('echohl WarningMsg | echo "Warning: %s" | echohl None', msg))
+    vim.cmd(string.format('echohl WarningMsg | echo "Neoclip Warning: %s" | echohl None', msg))
 end
 
 local function check_keys()
