@@ -5,13 +5,23 @@ local settings = require('neoclip.settings')
 M.stopped = false
 
 local function setup_auto_command()
-    vim.cmd([[
-        augroup neoclip
-            autocmd!
-            autocmd TextYankPost * :lua require("neoclip.handlers").handle_yank_post()
-            autocmd VimLeavePre * :lua require("neoclip.handlers").on_exit()
-        augroup end
-    ]])
+    local commands = {
+        'augroup neoclip',
+        'autocmd!',
+        'autocmd TextYankPost * :lua require("neoclip.handlers").handle_yank_post()',
+        'autocmd VimLeavePre * :lua require("neoclip.handlers").on_exit()',
+    }
+    if vim.fn.exists('#RecordingLeave') then
+        table.insert(
+            commands,
+            'autocmd RecordingLeave * :lua require("neoclip.handlers").handle_macro_post()'
+        )
+    end
+    table.insert(
+        commands,
+        'augroup end'
+    )
+    vim.cmd(table.concat(commands, '\n'))
 end
 
 M.stop = function()

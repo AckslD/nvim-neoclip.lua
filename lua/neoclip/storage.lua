@@ -2,7 +2,10 @@ local M = {}
 
 local settings = require('neoclip.settings').get()
 
-local storage = {}
+local storage = {
+    yanks = {},
+    macros = {},
+}
 if settings.enable_persistant_history then
     storage = require('neoclip.db').get()
 end
@@ -11,16 +14,19 @@ M.get = function()
     return storage
 end
 
-M.insert = function(contents)
-    while #storage >= settings.history do
-        table.remove(storage, #storage)
+M.insert = function(contents, typ)
+    local entries = storage[typ]
+    while #entries >= settings.history do
+        table.remove(entries, #entries)
     end
-    table.insert(storage, 1, contents)
+    table.insert(entries, 1, contents)
 end
 
 M.clear = function()
-    while #storage > 0 do
-        table.remove(storage, 1)
+    for _, entries in pairs(storage) do
+        while #entries > 0 do
+            table.remove(entries, 1)
+        end
     end
 end
 

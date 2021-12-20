@@ -1,5 +1,5 @@
 local handlers = require('neoclip.handlers')
-local storage = require('neoclip.storage').get()
+local storage = require('neoclip.storage').get().yanks
 local settings = require('neoclip.settings').get()
 local picker_utils = require('neoclip.picker_utils')
 

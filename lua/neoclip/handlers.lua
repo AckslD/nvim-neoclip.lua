@@ -37,8 +37,20 @@ M.handle_yank_post = function()
             regtype = get_regtype(event.regtype),
             contents = event.regcontents,
             filetype = vim.bo.filetype,
-        })
+        }, 'yanks')
     end
+end
+
+M.handle_macro_post = function()
+    if neoclip.stopped then
+        return
+    end
+    local event = vim.v.event -- TODO update
+    storage.insert({
+        regtype = get_regtype(event.regtype),
+        contents = event.regcontents,
+        filetype = nil,
+    }, 'macros')
 end
 
 M.on_exit = function()

@@ -7,6 +7,7 @@ local settings = {
     filter = nil,
     preview = true,
     default_register = '"',
+    default_register_macros = 'q',
     content_spec_column = false,
     on_paste = {
         set_reg = false,
@@ -17,12 +18,14 @@ local settings = {
                 select = '<cr>',
                 paste = '<c-p>',
                 paste_behind = '<c-k>',
+                run_macro = '<c-q>',
                 custom = {},
             },
             n = {
                 select = '<cr>',
                 paste = 'p',
                 paste_behind = 'P',
+                run_macro = 'q',
                 custom = {},
             },
         },
