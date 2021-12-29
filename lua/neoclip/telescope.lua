@@ -35,6 +35,19 @@ local function get_paste_handler(register_names, op)
     end
 end
 
+local function get_replay_recording_handler(register_names)
+    return function(prompt_bufnr)
+        local entry = action_state.get_selected_entry()
+        -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
+        -- and have it optional
+        actions.close(prompt_bufnr)
+        if settings.on_replay.set_reg then
+            handlers.set_registers(register_names, entry)
+        end
+        handlers.replay(entry)
+    end
+end
+
 local function get_custom_action_handler(register_names, action)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
@@ -128,7 +141,9 @@ local function get_export(register_names, typ)
             previewer = previewers.new_buffer_previewer({
                 define_preview = function(self, entry, status)
                     vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, true, entry.contents)
-                    vim.bo[self.state.bufnr].filetype = entry.filetype
+                    if entry.filetype ~= nil then
+                        vim.bo[self.state.bufnr].filetype = entry.filetype
+                    end
                 end,
                 dyn_title = function(self, entry)
                     return spec_from_entry(entry)
@@ -152,6 +167,7 @@ local function get_export(register_names, typ)
                     map_if_set(map, mode, keys.select, get_set_register_handler(register_names))
                     map_if_set(map, mode, keys.paste, get_paste_handler(register_names, 'p'))
                     map_if_set(map, mode, keys.paste_behind, get_paste_handler(register_names, 'P'))
+                    map_if_set(map, mode, keys.replay, get_replay_recording_handler(register_names))
                     if keys.custom ~= nil then
                         for key, action in pairs(keys.custom) do
                             map(mode, key, get_custom_action_handler(register_names, action))
@@ -186,14 +202,18 @@ M.get_exports = function(typ)
         local export = get_export(reg)
         exports[name] = export
     end
+    local command_name
+    local reg
     if typ == 'macros' then
-        register_names = settings.default_register_macros
+        reg = settings.default_register_macros
+        command_name = 'macroscope'
     else
-        register_names = settings.default_register
+        reg = settings.default_register
+        command_name = 'neoclip'
     end
-    local default = get_export(register_names, typ)
+    local default = get_export(reg, typ)
     exports['default'] = default
-    exports['neoclip'] = default
+    exports[command_name] = default
     return exports
 end
 

@@ -8,8 +8,12 @@ local settings = {
     preview = true,
     default_register = '"',
     default_register_macros = 'q',
+    enable_macro_history = true,
     content_spec_column = false,
     on_paste = {
+        set_reg = false,
+    },
+    on_replay = {
         set_reg = false,
     },
     keys = {
@@ -18,14 +22,14 @@ local settings = {
                 select = '<cr>',
                 paste = '<c-p>',
                 paste_behind = '<c-k>',
-                run_macro = '<c-q>',
+                replay = '<c-q>',
                 custom = {},
             },
             n = {
                 select = '<cr>',
                 paste = 'p',
                 paste_behind = 'P',
-                run_macro = 'q',
+                replay = 'q',
                 custom = {},
             },
         },
@@ -49,7 +53,6 @@ end
 local function check_keys()
     local keys = settings.keys
     if keys.i ~= nil or keys.n ~= nil then
-        -- TODO check PR number
         warn('Using settings.keys without specifying \'telescope\' or \'fzf\' will not be supported in the future, see #29.')
         keys.telescope = keys
     end

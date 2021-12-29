@@ -54,7 +54,6 @@ M.get = function(query)
         local success, entries = pcall(tbl.get, tbl, query)
         if success then
             storage[key] = entries
-            return entries
         else
             warn(string.format("Couldn't load (%s) history since: %s", key, entries))
             return {}
@@ -70,10 +69,12 @@ M.update = function(storage)
             warn(string.format("Couldn't remove clear database since: %s", msg))
             return
         end
-        success, msg = pcall(tbl.insert, tbl, storage[key])
-        if not success then
-            warn(string.format("Couldn't insert in database since: %s", msg))
-            return
+        if #storage[key] > 0 then  -- Don't insert if empty since it causes an error for some reason
+            success, msg = pcall(tbl.insert, tbl, storage[key])
+            if not success then
+                warn(string.format("Couldn't insert in database since: %s", msg))
+                return
+            end
         end
     end
 end

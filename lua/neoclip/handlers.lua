@@ -41,17 +41,18 @@ M.handle_yank_post = function()
     end
 end
 
-M.handle_macro_post = function()
+M.handle_macro_post = vim.schedule_wrap(function()
     if neoclip.stopped then
         return
     end
-    local event = vim.v.event -- TODO update
+    local regname = vim.fn.reg_recorded()
+    local reginfo = vim.fn.getreginfo(regname)
     storage.insert({
-        regtype = get_regtype(event.regtype),
-        contents = event.regcontents,
+        regtype = get_regtype(reginfo.regtype),
+        contents = reginfo.regcontents,
         filetype = nil,
     }, 'macros')
-end
+end)
 
 M.on_exit = function()
     storage.on_exit()
@@ -67,14 +68,27 @@ M.set_registers = function(register_names, entry)
     end
 end
 
-M.paste = function(entry, op)
+local function temporary_reg_usage(entry, callback)
     local register_name = '"'
     local current_contents = vim.fn.getreg(register_name)
     local current_regtype = vim.fn.getregtype(register_name)
     set_register(register_name, entry)
-    -- TODO can this be done without setting the register
-    vim.cmd(string.format('normal! "%s%s', register_name, op))
+    callback(register_name)
     vim.fn.setreg(register_name, current_contents, current_regtype)
+end
+
+-- TODO can this be done without setting the register?
+M.paste = function(entry, op)
+    temporary_reg_usage(entry, function(register_name)
+        vim.cmd(string.format('normal! "%s%s', register_name, op))
+    end)
+end
+
+-- TODO can this be done without setting the register?
+M.replay = function(entry)
+    temporary_reg_usage(entry, function(register_name)
+        vim.cmd(string.format('normal! @%s', register_name))
+    end)
 end
 
 return M

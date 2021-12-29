@@ -21,6 +21,8 @@ _Don't be like Bob, use neoclip!_ 🎉
 It records everything that gets yanked in your vim session (up to a limit which is by default 1000 entries but can be configured).
 You can then select an entry in the history using [`telescope`](https://github.com/nvim-telescope/telescope.nvim) or [`fzf-lua`](https://github.com/ibhagwan/fzf-lua) which then gets populated in a register of your choice.
 
+If you're on latest nightly (works if `:echo exists('##RecordingLeave')` returns `1`) `neoclip` will also keep track of any recorded macro (opt-out) which you can search for using `telescope`, put back in a register or simply replay.
+
 That's it!
 
 Oh, some more things, you can define an optional filter if you don't want some things to be saved and custom actions to take.
@@ -75,8 +77,13 @@ use {
       filter = nil,
       preview = true,
       default_register = '"',
+      default_register_macros = 'q',
+      enable_macro_history = true,
       content_spec_column = false,
       on_paste = {
+        set_reg = false,
+      },
+      on_replay = {
         set_reg = false,
       },
       keys = {
@@ -85,12 +92,14 @@ use {
             select = '<cr>',
             paste = '<c-p>',
             paste_behind = '<c-k>',
+            replay = '<c-q>',
             custom = {},
           },
           n = {
             select = '<cr>',
             paste = 'p',
             paste_behind = 'P',
+            replay = 'q',
             custom = {},
           },
         },
@@ -118,12 +127,16 @@ use {
   Useful for for example multiline yanks.
   When yanking the filetype is recorded in order to enable correct syntax highlighting in the preview.
   NOTE: in order to use the dynamic title showing the type of content and number of lines you need to configure `telescope` with the `dynamic_preview_title = true` option.
-* `default_register`: What register to by default when not specifying (e.g. `Telescope neoclip`).
+* `default_register`: What register to use by default when not specified (e.g. `Telescope neoclip`).
   Can be a string such as `'"'` (single register) or a table of strings such as `{'"', '+', '*'}`.
+* `default_register_macros`: What register to use for macros by default when not specified (e.g. `Telescope macroscope`).
+* `enable_macro_history`: If `true` (default) any recorded macro will be saved, see [macros](#macros).
 * `content_spec_colunm`: Can be set to `true` (default `false`) to use instead of the preview.
   It will only show the type and number of lines next to the first line of the entry.
 * `on_paste`:
-  * `set_reg`: if the register when pressing the key to paste directly.
+  * `set_reg`: if the register should be populated when pressing the key to paste directly.
+* `on_replay`:
+  * `set_reg`: if the register should be populated when pressing the key to replay a recorded macro.
 * `keys`: keys to use for the different pickers (`telescope` and `fzf-lua`).
   With `telescope` normal key-syntax is supported and both insert `i` and normal mode `n`.
   With `fzf-lua` only insert mode is supported and `fzf`-style key-syntax needs to be used.
@@ -189,6 +202,7 @@ require('neoclip').setup({
 ```
 
 ## Usage
+### Yanks
 Yank all you want and then do:
 ```vim
 :Telescope neoclip
@@ -231,6 +245,19 @@ if using `telescope` or
 :lua require('neoclip.fzf')({'a', 'star', 'plus', 'b'})
 ```
 if using `fzf-lua`.
+
+### Macros
+If `enable_macro_history` is set to `true` (default) in the [`setup`](#configuration) then any recorded macro will be stored and can later be accessed using:
+```vim
+:Telescope macroscope
+```
+or equivalently (which is probably the better way if you're lazy loading `telescope`):
+```vim
+:lua require('telescope').extensions.macroscope.default()
+```
+The same arguments are supported as for the `neoclip` extension.
+
+NOTE: This feature requires latest nightly and in particular [this PR](https://github.com/neovim/neovim/pull/16684). You can check that your neovim supports this by checking that `:echo exists('##RecordingLeave')` returns `1`. If not then everything will work normally except that no macro will be saved in the history of `neoclip`.
 
 ### Start/stop
 If you temporarily don't want `neoclip` to record anything you can use the following calls:
