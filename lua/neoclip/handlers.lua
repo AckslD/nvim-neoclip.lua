@@ -41,18 +41,17 @@ M.handle_yank_post = function()
     end
 end
 
-M.handle_macro_post = vim.schedule_wrap(function()
+M.handle_macro_post = function()
     if neoclip.stopped then
         return
     end
-    local regname = vim.fn.reg_recorded()
-    local reginfo = vim.fn.getreginfo(regname)
+    local event = vim.v.event
     storage.insert({
-        regtype = get_regtype(reginfo.regtype),
-        contents = reginfo.regcontents,
+        regtype = 'c',
+        contents = {event.regcontents},
         filetype = nil,
     }, 'macros')
-end)
+end
 
 M.on_exit = function()
     storage.on_exit()
