@@ -1,10 +1,11 @@
 local settings = require('neoclip.settings').get()
+local warn = require('neoclip.warn').warn
 
 local M = {}
 
 local has_sqlite, sqlite = pcall(require, "sqlite")
 if not has_sqlite then
-    print "Couldn't find sqlite.lua. Cannot use persistent history"
+    warn("Couldn't find sqlite.lua. Cannot use persistent history")
     return nil
 end
 
@@ -16,12 +17,12 @@ local function make_db_dir(db_path)
     os.execute('mkdir -p ' .. dirname(db_path))
 end
 
-local function get_tbl()
+local function get_tbl(name)
     local db_path = settings.db_path
     make_db_dir(db_path)
     local db = sqlite.new(db_path)
     db:open()
-    local tbl = db:tbl("neoclip", {
+    local tbl = db:tbl(name, {
         regtype = "text",
         contents = "luatable",
         filetype = "text",
@@ -30,7 +31,10 @@ local function get_tbl()
     return tbl
 end
 
-M.tbl = get_tbl()
+M.tables = {
+    yanks = get_tbl('neoclip'),
+    macros = get_tbl('macros'),
+}
 
 local function copy(t)
     local new = {}
@@ -45,23 +49,33 @@ local function copy(t)
 end
 
 M.get = function(query)
-    local success, entries = pcall(M.tbl.get, M.tbl, query)
-    if success then
-        return entries
-    else
-        print("Couldn't load history since:", entries)
-        return {}
+    local storage = {}
+    for key, tbl in pairs(M.tables) do
+        local success, entries = pcall(tbl.get, tbl, query)
+        if success then
+            storage[key] = entries
+        else
+            warn(string.format("Couldn't load (%s) history since: %s", key, entries))
+            return {}
+        end
     end
+    return storage
 end
 
 M.update = function(storage)
-    local success, msg = pcall(M.tbl.remove, M.tbl)
-    if not success then
-        print("Couldn't remove clear database since:", msg)
-    end
-    success, msg = pcall(M.tbl.insert, M.tbl, storage)
-    if not success then
-        print("Couldn't insert in database since:", msg)
+    for key, tbl in pairs(M.tables) do
+        local success, msg = pcall(tbl.remove, tbl)
+        if not success then
+            warn(string.format("Couldn't remove clear database since: %s", msg))
+            return
+        end
+        if #storage[key] > 0 then  -- Don't insert if empty since it causes an error for some reason
+            success, msg = pcall(tbl.insert, tbl, storage[key])
+            if not success then
+                warn(string.format("Couldn't insert in database since: %s", msg))
+                return
+            end
+        end
     end
 end
 
