@@ -36,8 +36,4 @@ M.on_exit = function()
     end
 end
 
-M.reset = function()
-    storage = {}
-end
-
 return M
