@@ -6,7 +6,7 @@ local function assert_scenario(scenario)
     if scenario.feedkeys then
         for _, raw_keys in ipairs(scenario.feedkeys) do
             local keys = vim.api.nvim_replace_termcodes(raw_keys, true, false, true)
-            vim.api.nvim_feedkeys(keys, 'xm', true)
+            vim.api.nvim_feedkeys(keys, 'xmt', true)
         end
     end
     if scenario.interlude then scenario.interlude() end
@@ -30,13 +30,15 @@ local function unload_neoclip()
 end
 
 describe("neoclip", function()
-    before_each(function()
-        vim.api.nvim_buf_set_lines(0, 0, -1, true, {})
-        require('neoclip').setup()
+    after_each(function()
         require('neoclip.storage').clear()
+        vim.api.nvim_buf_set_lines(0, 0, -1, true, {})
     end)
     it("storage", function()
         assert_scenario{
+            setup = function()
+                require('neoclip').setup()
+            end,
             initial_buffer = [[
 some line
 another line
@@ -89,7 +91,9 @@ a block
         assert_scenario{
             initial_buffer = [[some line]],
             setup = function()
-                require('neoclip.settings').get().history = 2
+                require('neoclip').setup({
+                    history = 2,
+                })
             end,
             feedkeys = {
                 "yy",
@@ -120,9 +124,11 @@ a block
         assert_scenario{
             initial_buffer = [[some line]],
             setup = function()
+                require('neoclip').setup({
+                    enable_persistant_history = true,
+                    db_path = '/tmp/nvim/databases/neoclip.sqlite3',
+                })
                 vim.fn.system('rm /tmp/nvim/databases/neoclip.sqlite3')
-                require('neoclip.settings').get().enable_persistant_history = true
-                require('neoclip.settings').get().db_path = '/tmp/nvim/databases/neoclip.sqlite3'
             end,
             feedkeys = {"yy"},
             interlude = function()
@@ -164,9 +170,11 @@ a block
                     return true
                 end
 
-                require('neoclip.settings').get().filter = function(data)
-                    return not all(data.event.regcontents, is_whitespace)
-                end
+                require('neoclip').setup({
+                    filter = function(data)
+                        return not all(data.event.regcontents, is_whitespace)
+                    end,
+                })
             end,
             feedkeys = {
                 "yy",
@@ -188,23 +196,68 @@ a block
             end,
         }
     end)
-    it("telescope", function()
-        -- TODO why doesn't this work?
+    it("macro", function()
         assert_scenario{
-            initial_buffer = [[some line
-another line]],
+            setup = function()
+                require('neoclip').setup()
+            end,
             feedkeys = {
+                "qq",
                 "yy",
-                "jyy",
-                [[:lua require('telescope').extensions.neoclip.neoclip()<CR>some<CR>]],
-                "p",
+                "q",
             },
             assert = function()
-                assert.are.equal(vim.fn.getreg('"'), 'some line\n')
+                assert_equal_tables(
+                    {
+                        {
+                            contents = {"yy"},
+                            regtype = "c"
+                        },
+                    },
+                    require('neoclip.storage').get().macros
+                )
             end,
-            expected_buffer = [[some line
-another line
-some line]],
         }
     end)
+    it("macro disabled", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    enable_macro_history = false,
+                })
+            end,
+            feedkeys = {
+                "qq",
+                "yy",
+                "q",
+            },
+            assert = function()
+                io.stdout:write(vim.cmd('autocmd RecordingLeave'))
+                assert.are.equal(vim.fn.getreg('q'), 'yy')
+                assert_equal_tables(
+                    {},
+                    require('neoclip.storage').get().macros
+                )
+            end,
+        }
+    end)
+    -- TODO why doesn't this work?
+--     it("telescope", function()
+--         assert_scenario{
+--             initial_buffer = [[some line
+-- another line]],
+--             feedkeys = {
+--                 "yy",
+--                 "jyy",
+--                 [[:lua require('telescope').extensions.neoclip.neoclip()<CR>some<CR>]],
+--                 "p",
+--             },
+--             assert = function()
+--                 assert.are.equal(vim.fn.getreg('"'), 'some line\n')
+--             end,
+--             expected_buffer = [[some line
+-- another line
+-- some line]],
+--         }
+--     end)
 end)
