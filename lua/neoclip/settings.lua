@@ -2,7 +2,7 @@ local M = {}
 
 local settings = {
     history = 1000,
-    enable_persistant_history = false,
+    enable_persistent_history = false,
     db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
     filter = nil,
     preview = true,
@@ -58,6 +58,21 @@ local function check_keys()
     end
 end
 
+local function check_persistant()
+    if settings.enable_persistant_history ~= nil then
+        warn([[
+            Using settings.enable_persistant_history will not be supported in the future, see #44.
+            Use settings.enable_persistent_history instead.
+        ]])
+        settings.enable_persistent_history = settings.enable_persistant_history
+    end
+end
+
+local function check_deprecated_entries()
+    check_keys()
+    check_persistant()
+end
+
 local function setup(opts, subsettings)
     if opts == nil then
         opts = {}
@@ -69,7 +84,7 @@ local function setup(opts, subsettings)
             subsettings[key] = value
         end
     end
-    check_keys()
+    check_deprecated_entries()
 end
 
 M.setup = function(opts)
