@@ -272,7 +272,7 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
   local function is_whitespace(line)
     return vim.fn.match(line, [[^\s*$]]) ~= -1
   end
-  
+
   local function all(tbl, check)
     for _, entry in ipairs(tbl) do
       if not check(entry) then
@@ -285,7 +285,7 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
   require('neoclip').setup{
     ...
     filter = function(data)
-        return not all(data.event.regcontents, is_whitespace)
+      return not all(data.event.regcontents, is_whitespace)
     end,
     ...
   }
