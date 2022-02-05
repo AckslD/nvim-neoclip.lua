@@ -267,6 +267,29 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
 
 ## Tips
 * If you lazy load [`telescope`](https://github.com/nvim-telescope/telescope.nvim) with [`packer`](https://github.com/wbthomason/packer.nvim) with for example the key `module = telescope`, then it's better to use e.g. `:lua require('telescope').extensions.neoclip.default()` than `:Telescope neoclip` (or `:lua require('telescope').extensions.neoclip['<reg>']()` over `:Telescope neoclip <reg>`) for keybindings since it will properly load `telescope` before calling the extension.
+* If you don't want to store pure whitespace yanks you could specify a filter as:
+  ```lua
+  local function is_whitespace(line)
+    return vim.fn.match(line, [[^\s*$]]) ~= -1
+  end
+  
+  local function all(tbl, check)
+    for _, entry in ipairs(tbl) do
+      if not check(entry) then
+        return false
+      end
+    end
+    return true
+  end
+  
+  require('neoclip').setup{
+    ...
+    filter = function(data)
+        return not all(data.event.regcontents, is_whitespace)
+    end,
+    ...
+  }
+  ```
 
 ## Troubleshooting
 * For some plugin managers it seems necessary to do
