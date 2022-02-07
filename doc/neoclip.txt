@@ -383,7 +383,7 @@ TIPS                                                            *neoclip-tips*
         require('neoclip').setup{
           ...
           filter = function(data)
-              return not all(data.event.regcontents, is_whitespace)
+            return not all(data.event.regcontents, is_whitespace)
           end,
           ...
         }
