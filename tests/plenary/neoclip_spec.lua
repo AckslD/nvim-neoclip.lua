@@ -125,7 +125,7 @@ a block
             initial_buffer = [[some line]],
             setup = function()
                 require('neoclip').setup({
-                    enable_persistant_history = true,
+                    enable_persistent_history = true,
                     db_path = '/tmp/nvim/databases/neoclip.sqlite3',
                 })
                 vim.fn.system('rm /tmp/nvim/databases/neoclip.sqlite3')
@@ -135,7 +135,7 @@ a block
                 -- emulate closing and starting neovim
                 vim.cmd('doautocmd VimLeavePre')
                 unload_neoclip()
-                require('neoclip.settings').get().enable_persistant_history = true
+                require('neoclip.settings').get().enable_persistent_history = true
                 require('neoclip.settings').get().db_path = '/tmp/nvim/databases/neoclip.sqlite3'
             end,
             assert = function()
