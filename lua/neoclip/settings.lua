@@ -60,10 +60,10 @@ end
 
 local function check_persistant()
     if settings.enable_persistant_history ~= nil then
-        warn([[
-            Using settings.enable_persistant_history will not be supported in the future, see #44.
-            Use settings.enable_persistent_history instead.
-        ]])
+        warn(''..
+            'Using settings.enable_persistant_history will not be supported in the future, see #44. '..
+            'Use settings.enable_persistent_history instead.'
+        )
         settings.enable_persistent_history = settings.enable_persistant_history
     end
 end

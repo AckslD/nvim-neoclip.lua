@@ -153,6 +153,19 @@ a block
             end,
         }
     end)
+    it("persistant history", function()
+        assert_scenario{
+            initial_buffer = [[some line]],
+            setup = function()
+                require('neoclip').setup({
+                    enable_persistant_history = true,
+                })
+            end,
+            assert = function()
+                assert.are.equal(require('neoclip.settings').get().enable_persistent_history, true)
+            end,
+        }
+    end)
     it("filter (whitespace)", function()
         assert_scenario{
             initial_buffer = '\nsome line\n\n\t\n',
