@@ -6,7 +6,7 @@ local storage = {
     yanks = {},
     macros = {},
 }
-if settings.enable_persistant_history then
+if settings.enable_persistent_history then
     storage = require('neoclip.db').get()
 end
 
@@ -31,7 +31,7 @@ M.clear = function()
 end
 
 M.on_exit = function()
-    if settings.enable_persistant_history then
+    if settings.enable_persistent_history then
         require('neoclip.db').update(storage)
     end
 end

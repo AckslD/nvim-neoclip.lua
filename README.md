@@ -72,7 +72,7 @@ use {
   config = function()
     require('neoclip').setup({
       history = 1000,
-      enable_persistant_history = false,
+      enable_persistent_history = false,
       db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
       filter = nil,
       preview = true,
@@ -115,8 +115,8 @@ use {
 }
 ```
 * `history`: The max number of entries to store (default 1000).
-* `enable_persistant_history`: If set to `true` the history is stored on `VimLeavePre` using [`sqlite.lua`](https://github.com/tami5/sqlite.lua) and lazy loaded when querying.
-* `db_path`: The path to the sqlite database to store history if `enable_persistant_history=true`.
+* `enable_persistent_history`: If set to `true` the history is stored on `VimLeavePre` using [`sqlite.lua`](https://github.com/tami5/sqlite.lua) and lazy loaded when querying.
+* `db_path`: The path to the sqlite database to store history if `enable_persistent_history=true`.
   Defaults to `vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3` which on my system is `~/.local/share/nvim/databases/neoclip.sqlite3`
 * `filter`: A function to filter what entries to store (default all are stored).
   This function filter should return `true` (include the yanked entry) or `false` (don't include it) based on a table as the only argument, which has the following keys:
@@ -272,7 +272,7 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
   local function is_whitespace(line)
     return vim.fn.match(line, [[^\s*$]]) ~= -1
   end
-  
+
   local function all(tbl, check)
     for _, entry in ipairs(tbl) do
       if not check(entry) then
@@ -285,7 +285,7 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
   require('neoclip').setup{
     ...
     filter = function(data)
-        return not all(data.event.regcontents, is_whitespace)
+      return not all(data.event.regcontents, is_whitespace)
     end,
     ...
   }
