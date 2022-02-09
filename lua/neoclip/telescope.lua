@@ -199,7 +199,7 @@ end
 M.get_exports = function(typ)
     local exports = {}
     for reg, name in pairs(register_names()) do
-        local export = get_export(reg)
+        local export = get_export(reg, typ)
         exports[name] = export
     end
     local command_name
