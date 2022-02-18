@@ -1,3 +1,11 @@
+local function escape_keys(keys)
+    return vim.api.nvim_replace_termcodes(keys, true, false, true)
+end
+
+local function feedkeys(keys)
+    vim.api.nvim_feedkeys(escape_keys(keys), 'xmt', true)
+end
+
 local function assert_scenario(scenario)
     if scenario.initial_buffer then
         vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(scenario.initial_buffer, '\n'))
@@ -5,8 +13,13 @@ local function assert_scenario(scenario)
     if scenario.setup then scenario.setup() end
     if scenario.feedkeys then
         for _, raw_keys in ipairs(scenario.feedkeys) do
-            local keys = vim.api.nvim_replace_termcodes(raw_keys, true, false, true)
-            vim.api.nvim_feedkeys(keys, 'xmt', true)
+            if type(raw_keys) == 'string' then
+                feedkeys(raw_keys)
+            else
+                if raw_keys.before then raw_keys.before() end
+                feedkeys(raw_keys.keys)
+                if raw_keys.after then raw_keys.after() end
+            end
         end
     end
     if scenario.interlude then scenario.interlude() end
@@ -21,9 +34,9 @@ local function assert_equal_tables(tbl1, tbl2)
     assert(vim.deep_equal(tbl1, tbl2), string.format("%s ~= %s", vim.inspect(tbl1), vim.inspect(tbl2)))
 end
 
-local function unload_neoclip()
+local function unload(name)
     for pkg, _ in pairs(package.loaded) do
-        if vim.fn.match(pkg, 'neoclip') ~= -1 then
+        if vim.fn.match(pkg, name) ~= -1 then
             package.loaded[pkg] = nil
         end
     end
@@ -32,6 +45,8 @@ end
 describe("neoclip", function()
     after_each(function()
         require('neoclip.storage').clear()
+        unload('neoclip')
+        unload('telescope')
         vim.api.nvim_buf_set_lines(0, 0, -1, true, {})
     end)
     it("storage", function()
@@ -134,7 +149,7 @@ a block
             interlude = function()
                 -- emulate closing and starting neovim
                 vim.cmd('doautocmd VimLeavePre')
-                unload_neoclip()
+                unload('neoclip')
                 require('neoclip.settings').get().enable_persistent_history = true
                 require('neoclip.settings').get().db_path = '/tmp/nvim/databases/neoclip.sqlite3'
             end,
@@ -209,6 +224,130 @@ a block
             end,
         }
     end)
+    it("basic telescope usage", function()
+        assert_scenario{
+            initial_buffer = [[some line
+another line]],
+            feedkeys = {
+                "yy",
+                "jyy",
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "k<CR>",
+                "p",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('"'), 'some line\n')
+            end,
+            expected_buffer = [[some line
+another line
+some line]],
+        }
+    end)
+    it("paste directly", function()
+        assert_scenario{
+            initial_buffer = [[some line
+another line]],
+            feedkeys = {
+                "yy",
+                "jyy",
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "kp",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('"'), 'another line\n')
+            end,
+            expected_buffer = [[some line
+another line
+some line]],
+        }
+    end)
+    it("set reg on paste", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    on_paste = {
+                        set_reg = true,
+                    }
+                })
+            end,
+            initial_buffer = [[some line
+another line]],
+            feedkeys = {
+                "yy",
+                "jyy",
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "kp",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('"'), 'some line\n')
+            end,
+            expected_buffer = [[some line
+another line
+some line]],
+        }
+    end)
+    it("default register", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    default_register = 'a',
+                })
+            end,
+            initial_buffer = [[some line]],
+            feedkeys = {
+                "yy",
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.default()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "<CR>",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('a'), 'some line\n')
+            end,
+        }
+    end)
+    it("multiple default registers", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    default_register = {'a', 'b'},
+                })
+            end,
+            initial_buffer = [[some line]],
+            feedkeys = {
+                "yy",
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "<CR>",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('a'), 'some line\n')
+                assert.are.equal(vim.fn.getreg('b'), 'some line\n')
+            end,
+        }
+    end)
     it("macro", function()
         assert_scenario{
             setup = function()
@@ -245,7 +384,6 @@ a block
                 "q",
             },
             assert = function()
-                io.stdout:write(vim.cmd('autocmd RecordingLeave'))
                 assert.are.equal(vim.fn.getreg('q'), 'yy')
                 assert_equal_tables(
                     {},
@@ -254,23 +392,122 @@ a block
             end,
         }
     end)
-    -- TODO why doesn't this work?
---     it("telescope", function()
+    -- TODO why does this fail?
+--     it("replay directly", function()
 --         assert_scenario{
 --             initial_buffer = [[some line
 -- another line]],
 --             feedkeys = {
---                 "yy",
---                 "jyy",
---                 [[:lua require('telescope').extensions.neoclip.neoclip()<CR>some<CR>]],
---                 "p",
+--                 "qq",
+--                 "yyp",
+--                 "q",
+--                 "qq",
+--                 "j",
+--                 "q",
+--                 {
+--                     keys=[[:lua require('telescope').extensions.macroscope.default()<CR>]],
+--                     after = function()
+--                         vim.wait(100, function() end)
+--                     end,
+--                 },
+--                 "kq",
 --             },
 --             assert = function()
---                 assert.are.equal(vim.fn.getreg('"'), 'some line\n')
+--                 assert.are.equal(vim.fn.getreg('q'), 'j')
 --             end,
 --             expected_buffer = [[some line
+-- some line
 -- another line
--- some line]],
+-- another line]],
 --         }
 --     end)
+    it("set reg on replay", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    on_replay = {
+                        set_reg = true,
+                    }
+                })
+            end,
+            initial_buffer = [[some line
+another line]],
+            feedkeys = {
+                "qq",
+                "yyp",
+                "q",
+                "qq",
+                "j",
+                "q",
+                {
+                    keys=[[:lua require('telescope').extensions.macroscope.default()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "kq",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('q'), 'yyp')
+            end,
+            expected_buffer = [[some line
+some line
+another line
+another line]],
+        }
+    end)
+    it("macro default register", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    default_register_macros = 'a',
+                })
+            end,
+            initial_buffer = [[some line]],
+            feedkeys = {
+                "qq",
+                "yy",
+                "q",
+                {
+                    keys=[[:lua require('telescope').extensions.macroscope.macroscope()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "<CR>",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('a'), 'yy')
+            end,
+        }
+    end)
+    it("multiple default registers", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    default_register_macros = {'a', 'b'},
+                })
+            end,
+            initial_buffer = [[some line]],
+            feedkeys = {
+                "qq",
+                "yy",
+                "q",
+                {
+                    keys=[[:lua require('telescope').extensions.macroscope.macroscope()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "<CR>",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('a'), 'yy')
+                assert.are.equal(vim.fn.getreg('b'), 'yy')
+            end,
+        }
+    end)
+    -- TODO
+    -- * keys
+    -- * commands for other registers (extra)
 end)
