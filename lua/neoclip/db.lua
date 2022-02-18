@@ -14,7 +14,7 @@ local function dirname(str)
 end
 
 local function make_db_dir(db_path)
-    os.execute('mkdir -p ' .. dirname(db_path))
+    vim.fn.mkdir(dirname(db_path), 'p')
 end
 
 local function get_tbl(name)
