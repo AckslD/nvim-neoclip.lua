@@ -392,35 +392,6 @@ some line]],
             end,
         }
     end)
-    -- TODO why does this fail?
---     it("replay directly", function()
---         assert_scenario{
---             initial_buffer = [[some line
--- another line]],
---             feedkeys = {
---                 "qq",
---                 "yyp",
---                 "q",
---                 "qq",
---                 "j",
---                 "q",
---                 {
---                     keys=[[:lua require('telescope').extensions.macroscope.default()<CR>]],
---                     after = function()
---                         vim.wait(100, function() end)
---                     end,
---                 },
---                 "kq",
---             },
---             assert = function()
---                 assert.are.equal(vim.fn.getreg('q'), 'j')
---             end,
---             expected_buffer = [[some line
--- some line
--- another line
--- another line]],
---         }
---     end)
     it("set reg on replay", function()
         assert_scenario{
             setup = function()
@@ -507,7 +478,135 @@ another line]],
             end,
         }
     end)
-    -- TODO
-    -- * keys
-    -- * commands for other registers (extra)
+    it("extra", function()
+        assert_scenario{
+            initial_buffer = [[some line
+another line]],
+            feedkeys = {
+                "yy",
+                "jyy",
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip({extra='a,b,c'})<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "k<CR>",
+                "p",
+            },
+            assert = function()
+                for _, reg in ipairs({'"', 'a', 'b', 'c'}) do
+                    assert.are.equal(vim.fn.getreg(reg), 'some line\n')
+                end
+            end,
+            expected_buffer = [[some line
+another line
+some line]],
+        }
+    end)
+    it("keybinds", function()
+        local keys = {
+            telescope = {
+                i = {
+                    select = '<c-a>',
+                    paste = '<c-b>',
+                    paste_behind = '<c-c>',
+                    replay = '<c-d>',
+                    custom = {
+                        ['<c-e>'] = function(opts)
+                            return opts
+                        end
+                    },
+                },
+                n = {
+                    select = 'a',
+                    paste = 'b',
+                    paste_behind = 'c',
+                    replay = 'd',
+                    custom = {
+                        e = function(opts)
+                            return opts
+                        end
+                    },
+                },
+            },
+            fzf = {
+                select = '<c-a>',
+                paste = '<c-b>',
+                paste_behind = '<c-c>',
+                custom = {
+                    ['<c-e>'] = function(opts)
+                        return opts
+                    end
+                },
+            },
+        }
+
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    keys = keys,
+                })
+            end,
+            assert = function()
+                assert_equal_tables(require('neoclip.settings').get().keys, keys)
+            end,
+        }
+    end)
+    it("keybinds (deprecated)", function()
+        local keys = {
+            i = {
+                select = '<c-a>',
+            },
+        }
+
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    keys = keys,
+                })
+            end,
+            assert = function()
+                assert.are.equal(require('neoclip.settings').get().keys.telescope.i.select, '<c-a>')
+            end,
+        }
+    end)
+end)
+
+-- TODO why does this needs it's own thing?
+describe("neoclip", function()
+    after_each(function()
+        require('neoclip.storage').clear()
+        unload('neoclip')
+        unload('telescope')
+        vim.api.nvim_buf_set_lines(0, 0, -1, true, {})
+    end)
+    it("replay directly", function()
+        assert_scenario{
+            initial_buffer = [[some line
+another line]],
+            feedkeys = {
+                "qq",
+                "yyp",
+                "q",
+                "qq",
+                "j",
+                "q",
+                {
+                    keys=[[:lua require('telescope').extensions.macroscope.default()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "kq",
+            },
+            assert = function()
+                assert.are.equal(vim.fn.getreg('q'), 'j')
+            end,
+            expected_buffer = [[some line
+some line
+another line
+another line]],
+        }
+    end)
 end)
