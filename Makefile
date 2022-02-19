@@ -1,4 +1,4 @@
-TESTS_DIR=tests/plenary
+TESTS_DIR=tests/plenary/
 TESTS_INIT=tests/init.lua
 PLENARY_INIT=tests/plenary_init.lua
 

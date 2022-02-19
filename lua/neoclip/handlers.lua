@@ -90,4 +90,8 @@ M.replay = function(entry)
     end)
 end
 
+M.delete = function(typ, entry)
+    storage.delete(typ, entry)
+end
+
 return M

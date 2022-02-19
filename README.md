@@ -73,6 +73,7 @@ use {
     require('neoclip').setup({
       history = 1000,
       enable_persistent_history = false,
+      continious_sync = false,
       db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
       filter = nil,
       preview = true,
@@ -92,7 +93,8 @@ use {
             select = '<cr>',
             paste = '<c-p>',
             paste_behind = '<c-k>',
-            replay = '<c-q>',
+            replay = '<c-q>',  -- replay a macro
+            delete = '<c-d>',  -- delete an entry
             custom = {},
           },
           n = {
@@ -100,6 +102,7 @@ use {
             paste = 'p',
             paste_behind = 'P',
             replay = 'q',
+            delete = 'd',
             custom = {},
           },
         },
@@ -116,6 +119,11 @@ use {
 ```
 * `history`: The max number of entries to store (default 1000).
 * `enable_persistent_history`: If set to `true` the history is stored on `VimLeavePre` using [`sqlite.lua`](https://github.com/tami5/sqlite.lua) and lazy loaded when querying.
+* `continuous_sync`: If set to `true`, the runtime history is synced with the persistent storage everytime it's changed or queried.
+  If you often use multiple sessions in parallel and wants the history synced you might want to enable this.
+  Of by default cause it might cause delays since the history is written to file everytime you yank something.
+  Although, I don't really notice a slowdown.
+  Alternatively see `db_pull` and `db_push` functions [below](#sync-database).
 * `db_path`: The path to the sqlite database to store history if `enable_persistent_history=true`.
   Defaults to `vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3` which on my system is `~/.local/share/nvim/databases/neoclip.sqlite3`
 * `filter`: A function to filter what entries to store (default all are stored).
@@ -265,7 +273,18 @@ If you temporarily don't want `neoclip` to record anything you can use the follo
 * `:lua require('neoclip').stop()`
 * `:lua require('neoclip').toggle()`
 
+### Sync database
+If you don't want to use the setting `continuous_sync`, but still keep two instances of neovim synchronized in their `neoclip` history you can use the functions:
+* `:lua require('neoclip').db_pull()`: Pulls the database (overwrites any local history in the current session).
+* `:lua require('neoclip').db_push()`: Pushes to the database (overwrites any history previous saved in the database).
+
+### Remove entries
+You can remove entries manually using the keybinds for `delete`. You can also delete the whole history with `:lua require('neoclip').clear_history()`.
+
 ## Tips
+* Duplicate yanks are not stored, but rather pushed forward in the history such that they are the first choice when searching for previous yanks.
+  Equality is checked using content and also type (ie charwise, linewise or blockwise), so if you have to yanks with the same content but when yanked charwise and the other linewise, these are considered two different entries.
+  However, the filetype in the buffer when the yanked happened is not, so if you yank `print('hello')` in a `python` file and then in a `lua` file you'll have a single entry which will be previewed using `lua` syntax.
 * If you lazy load [`telescope`](https://github.com/nvim-telescope/telescope.nvim) with [`packer`](https://github.com/wbthomason/packer.nvim) with for example the key `module = telescope`, then it's better to use e.g. `:lua require('telescope').extensions.neoclip.default()` than `:Telescope neoclip` (or `:lua require('telescope').extensions.neoclip['<reg>']()` over `:Telescope neoclip <reg>`) for keybindings since it will properly load `telescope` before calling the extension.
 * If you don't want to store pure whitespace yanks you could specify a filter as:
   ```lua

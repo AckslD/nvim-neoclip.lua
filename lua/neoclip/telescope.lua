@@ -9,7 +9,7 @@ local entry_display = require "telescope.pickers.entry_display"
 local previewers = require('telescope.previewers')
 
 local handlers = require('neoclip.handlers')
-local storage = require('neoclip.storage').get()
+local storage = require('neoclip.storage')
 local settings = require('neoclip.settings').get()
 local utils = require('neoclip.utils')
 local picker_utils = require('neoclip.picker_utils')
@@ -60,6 +60,15 @@ local function get_custom_action_handler(register_names, action)
                 regtype=entry.regtype,
             }
         })
+    end
+end
+
+local function get_delete_handler(typ)
+    return function(prompt_bufnr)
+        local current_picker = action_state.get_current_picker(prompt_bufnr)
+        current_picker:delete_selection(function(selection)
+            handlers.delete(typ, selection)
+        end)
     end
 end
 
@@ -153,10 +162,11 @@ local function get_export(register_names, typ)
         if opts ~= nil and opts.extra ~= nil then
             register_names = utils.join(register_names, parse_extra(opts.extra))
         end
+        local results = storage.get({reversed = true})[typ]
         pickers.new(opts, {
             prompt_title = picker_utils.make_prompt_title(register_names),
             finder = finders.new_table({
-                results = storage[typ],
+                results = results,
                 entry_maker = entry_maker,
             }),
             previewer = previewer,
@@ -168,6 +178,7 @@ local function get_export(register_names, typ)
                     map_if_set(map, mode, keys.paste, get_paste_handler(register_names, 'p'))
                     map_if_set(map, mode, keys.paste_behind, get_paste_handler(register_names, 'P'))
                     map_if_set(map, mode, keys.replay, get_replay_recording_handler(register_names))
+                    map_if_set(map, mode, keys.delete, get_delete_handler(typ))
                     if keys.custom ~= nil then
                         for key, action in pairs(keys.custom) do
                             map(mode, key, get_custom_action_handler(register_names, action))

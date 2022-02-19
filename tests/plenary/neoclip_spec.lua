@@ -30,10 +30,6 @@ local function assert_scenario(scenario)
     end
 end
 
-local function assert_equal_tables(tbl1, tbl2)
-    assert(vim.deep_equal(tbl1, tbl2), string.format("%s ~= %s", vim.inspect(tbl1), vim.inspect(tbl2)))
-end
-
 local function unload(name)
     for pkg, _ in pairs(package.loaded) do
         if vim.fn.match(pkg, name) ~= -1 then
@@ -104,17 +100,52 @@ a block
     end)
     it("storage max", function()
         assert_scenario{
-            initial_buffer = [[some line]],
+            initial_buffer = [[
+a
+b
+c
+d
+]],
             setup = function()
                 require('neoclip').setup({
                     history = 2,
                 })
             end,
             feedkeys = {
+                "jyy",
+                "jyy",
+                "jyy",
+                "jyy",
+            },
+            assert = function()
+                assert_equal_tables(
+                    {
+                        {
+                            contents = {"d"},
+                            filetype = "",
+                            regtype = "l"
+                        },
+                        {
+                            contents = {"c"},
+                            filetype = "",
+                            regtype = "l"
+                        },
+                    },
+                    require('neoclip.storage').get().yanks
+                )
+            end,
+        }
+    end)
+    it("duplicates", function()
+        assert_scenario{
+            initial_buffer = [[some line]],
+            setup = function()
+                require('neoclip').setup()
+            end,
+            feedkeys = {
                 "yy",
                 "yy",
-                "yy",
-                "yy",
+                "Y",
             },
             assert = function()
                 assert_equal_tables(
@@ -122,7 +153,7 @@ a block
                         {
                             contents = {"some line"},
                             filetype = "",
-                            regtype = "l"
+                            regtype = "c"
                         },
                         {
                             contents = {"some line"},
@@ -132,6 +163,56 @@ a block
                     },
                     require('neoclip.storage').get().yanks
                 )
+            end,
+        }
+    end)
+    it("continuous_sync push", function()
+        local called = false
+        assert_scenario{
+            initial_buffer = [[some line]],
+            setup = function()
+                require('neoclip').setup({
+                    enable_persistent_history = true,
+                    continuous_sync = true,
+                })
+                -- mock the push
+                require('neoclip.storage').push = function()
+                    called = true
+                end
+            end,
+            feedkeys = {
+                "yy",
+            },
+            assert = function()
+                assert(called)
+            end,
+        }
+    end)
+    it("continuous_sync pull", function()
+        local called = false
+        assert_scenario{
+            initial_buffer = [[some line]],
+            setup = function()
+                require('neoclip').setup({
+                    enable_persistent_history = true,
+                    continuous_sync = true,
+                })
+                -- mock the pull
+                require('neoclip.storage').pull = function()
+                    called = true
+                end
+            end,
+            feedkeys = {
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "<Esc>",
+            },
+            assert = function()
+                assert(called)
             end,
         }
     end)
@@ -512,8 +593,9 @@ some line]],
                     paste = '<c-b>',
                     paste_behind = '<c-c>',
                     replay = '<c-d>',
+                    delete = '<c-e>',
                     custom = {
-                        ['<c-e>'] = function(opts)
+                        ['<c-f>'] = function(opts)
                             return opts
                         end
                     },
@@ -523,8 +605,9 @@ some line]],
                     paste = 'b',
                     paste_behind = 'c',
                     replay = 'd',
+                    delete = 'e',
                     custom = {
-                        e = function(opts)
+                        f = function(opts)
                             return opts
                         end
                     },

@@ -36,6 +36,14 @@ M.toggle = function()
     M.stopped = not M.stopped
 end
 
+M.db_pull = function()
+    require('neoclip.storage').pull()
+end
+
+M.db_push = function()
+    require('neoclip.storage').push()
+end
+
 M.clear_history = function()
     require('neoclip.storage').clear()
 end

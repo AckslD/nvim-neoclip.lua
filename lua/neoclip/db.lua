@@ -36,19 +36,7 @@ M.tables = {
     macros = get_tbl('macros'),
 }
 
-local function copy(t)
-    local new = {}
-    for k, v in pairs(t) do
-        if type(v) == 'table' then
-            new[k] = copy(v)
-        else
-            new[k] = v
-        end
-    end
-    return new
-end
-
-M.get = function(query)
+M.read = function(query)
     local storage = {}
     for key, tbl in pairs(M.tables) do
         local success, entries = pcall(tbl.get, tbl, query)
@@ -62,7 +50,7 @@ M.get = function(query)
     return storage
 end
 
-M.update = function(storage)
+M.write = function(storage)
     for key, tbl in pairs(M.tables) do
         local success, msg = pcall(tbl.remove, tbl)
         if not success then

@@ -3,6 +3,7 @@ local M = {}
 local settings = {
     history = 1000,
     enable_persistent_history = false,
+    continuous_sync = false,
     db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
     filter = nil,
     preview = true,
@@ -23,6 +24,7 @@ local settings = {
                 paste = '<c-p>',
                 paste_behind = '<c-k>',
                 replay = '<c-q>',
+                delete = '<c-d>',
                 custom = {},
             },
             n = {
@@ -30,6 +32,7 @@ local settings = {
                 paste = 'p',
                 paste_behind = 'P',
                 replay = 'q',
+                delete = 'd',
                 custom = {},
             },
         },
