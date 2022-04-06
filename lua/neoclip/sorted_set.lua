@@ -33,6 +33,7 @@ local pop = function(self)
     if entry then
         self.entries[hash(entry)] = nil
     end
+    return entry
 end
 
 --- insert a new entry

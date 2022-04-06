@@ -73,7 +73,7 @@ use {
     require('neoclip').setup({
       history = 1000,
       enable_persistent_history = false,
-      continious_sync = false,
+      continuous_sync = false,
       db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
       filter = nil,
       preview = true,
