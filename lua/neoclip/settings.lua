@@ -4,6 +4,7 @@ local settings = {
     history = 1000,
     enable_persistent_history = false,
     continuous_sync = false,
+    enable_system_clipboard = false,
     db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
     filter = nil,
     preview = true,
