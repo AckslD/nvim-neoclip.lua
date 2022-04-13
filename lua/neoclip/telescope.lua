@@ -162,7 +162,7 @@ local function get_export(register_names, typ)
         if opts ~= nil and opts.extra ~= nil then
             register_names = utils.join(register_names, parse_extra(opts.extra))
         end
-		-- NOTE: use system clipboard
+        -- NOTE: use system clipboard
         handlers.handle_system_yank()
         local results = storage.get({reversed = true})[typ]
         pickers.new(opts, {
