@@ -97,11 +97,6 @@ end
 
 M.delete = function(typ, entry)
     storage.delete(typ, entry)
-    if settings.enable_system_clipboard then
-        for _, register in ipairs({'+', '*'}) do
-            vim.fn.setreg(register, {}, 'c')
-        end
-    end
 end
 
 M.handle_system_yank = function ()
