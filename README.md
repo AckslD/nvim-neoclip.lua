@@ -73,6 +73,7 @@ use {
     require('neoclip').setup({
       history = 1000,
       enable_persistent_history = false,
+      length_limit = 1048576,
       continuous_sync = false,
       db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
       filter = nil,
@@ -119,6 +120,7 @@ use {
 ```
 * `history`: The max number of entries to store (default 1000).
 * `enable_persistent_history`: If set to `true` the history is stored on `VimLeavePre` using [`sqlite.lua`](https://github.com/tami5/sqlite.lua) and lazy loaded when querying.
+* `length_limit`: The max number of characters of an entry to be stored (default 1MiB). If the length of the yanked string is larger than the limit, it will not be stored.
 * `continuous_sync`: If set to `true`, the runtime history is synced with the persistent storage everytime it's changed or queried.
   If you often use multiple sessions in parallel and wants the history synced you might want to enable this.
   Of by default cause it might cause delays since the history is written to file everytime you yank something.
