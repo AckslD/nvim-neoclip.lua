@@ -658,12 +658,12 @@ some line]],
         assert_scenario{
             setup = function()
                 require('neoclip').setup({
-                    length_limit = 7,
+                    length_limit = 8,
                 })
             end,
             initial_buffer = [[1234
 567
-89
+
 123456789
 ]],
             feedkeys = {
@@ -671,15 +671,15 @@ some line]],
                 "yj",
                 "y2j",
                 "3j",
-                "y7l",
                 "y8l",
+                "y9l",
                 "yy",
             },
             assert = function()
                 assert_equal_tables(
                     {
                         {
-                            contents = {"1234567"},
+                            contents = {"12345678"},
                             filetype = "",
                             regtype = "c"
                         },

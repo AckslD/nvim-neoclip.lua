@@ -6,7 +6,7 @@ local settings = require('neoclip.settings').get()
 
 local function should_add(event)
     if settings.length_limit then
-        local length = 0
+        local length = #event.regcontents - 1
         for _,line in ipairs(event.regcontents) do
             length = length + #line
         end
