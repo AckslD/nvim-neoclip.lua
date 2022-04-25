@@ -5,16 +5,26 @@ local storage = require('neoclip.storage')
 local settings = require('neoclip.settings').get()
 
 local function should_add(event)
+    if settings.length_limit then
+        local length = #event.regcontents - 1
+        for _,line in ipairs(event.regcontents) do
+            length = length + #line
+            if length > settings.length_limit then
+                return false
+            end
+        end
+    end
     if settings.filter ~= nil then
         local data = {
             event = event,
             filetype = vim.bo.filetype,
             buffer_name = vim.api.nvim_buf_get_name(0),
         }
-        return settings.filter(data)
-    else
-        return true
+        if not settings.filter(data) then
+            return false
+        end
     end
+    return true
 end
 
 local function get_regtype(regtype)
