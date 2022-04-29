@@ -318,7 +318,7 @@ another line]],
                         vim.wait(100, function() end)
                     end,
                 },
-                "<Esc>k<CR>",
+                "k<CR>",
                 "p",
             },
             assert = function()
@@ -342,7 +342,7 @@ another line]],
                         vim.wait(100, function() end)
                     end,
                 },
-                "<Esc>kp",
+                "kp",
             },
             assert = function()
                 assert.are.equal(vim.fn.getreg('"'), 'another line\n')
@@ -372,7 +372,7 @@ another line]],
                         vim.wait(100, function() end)
                     end,
                 },
-                "<Esc>kp",
+                "kp",
             },
             assert = function()
                 assert.are.equal(vim.fn.getreg('"'), 'some line\n')
@@ -497,7 +497,7 @@ another line]],
                         vim.wait(100, function() end)
                     end,
                 },
-                "<Esc>kq",
+                "kq",
             },
             assert = function()
                 assert.are.equal(vim.fn.getreg('q'), 'yyp')
@@ -572,7 +572,7 @@ another line]],
                         vim.wait(100, function() end)
                     end,
                 },
-                "<Esc>k<CR>",
+                "k<CR>",
                 "p",
             },
             assert = function()
@@ -726,7 +726,7 @@ another line]],
                         vim.wait(100, function() end)
                     end,
                 },
-                "<Esc>kq",
+                "kq",
             },
             assert = function()
                 assert.are.equal(vim.fn.getreg('q'), 'j')
