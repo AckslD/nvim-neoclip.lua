@@ -15,15 +15,16 @@ local utils = require('neoclip.utils')
 local picker_utils = require('neoclip.picker_utils')
 
 local function get_set_register_handler(register_names)
-    return function(prompt_bufnr)
+    local function select(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
         handlers.set_registers(register_names, entry)
     end
+    return select
 end
 
 local function get_paste_handler(register_names, op)
-    return function(prompt_bufnr)
+    local function paste_op(prompt_bufnr, op)
         local entry = action_state.get_selected_entry()
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
@@ -33,10 +34,27 @@ local function get_paste_handler(register_names, op)
         end
         handlers.paste(entry, op)
     end
+
+    if op == 'p' then
+        local function paste(prompt_bufnr)
+            paste_op(prompt_bufnr, 'p')
+        end
+        return paste
+    elseif op == 'P' then
+        local function paste_behind(prompt_bufnr)
+            paste_op(prompt_bufnr, 'P')
+        end
+        return paste_behind
+    else
+        local function paste_other(prompt_bufnr)
+            paste_op(prompt_bufnr, op)
+        end
+        return paste_other
+    end
 end
 
 local function get_replay_recording_handler(register_names)
-    return function(prompt_bufnr)
+    local function replay(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
@@ -46,10 +64,11 @@ local function get_replay_recording_handler(register_names)
         end
         handlers.replay(entry)
     end
+    return replay
 end
 
 local function get_custom_action_handler(register_names, action)
-    return function(prompt_bufnr)
+    local function custom_action(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
         action({
@@ -61,15 +80,17 @@ local function get_custom_action_handler(register_names, action)
             }
         })
     end
+    return custom_action
 end
 
 local function get_delete_handler(typ)
-    return function(prompt_bufnr)
+    local function delete(prompt_bufnr)
         local current_picker = action_state.get_current_picker(prompt_bufnr)
         current_picker:delete_selection(function(selection)
             handlers.delete(typ, selection)
         end)
     end
+    return delete
 end
 
 local displayer = entry_display.create {
