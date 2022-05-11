@@ -136,7 +136,11 @@ end
 
 local function map_if_set(map, mode, key, desc, handler)
     if key ~= nil then
-        map(mode, key, {desc, handler})
+        map(mode, key, setmetatable({desc}, {
+          __call = function(_, ...)
+            return handler(...)
+          end,
+        }))
     end
 end
 
