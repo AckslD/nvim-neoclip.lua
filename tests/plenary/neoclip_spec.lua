@@ -209,7 +209,7 @@ d
                         vim.wait(100, function() end)
                     end,
                 },
-                "<Esc>",
+                "<Esc><Esc>",
             },
             assert = function()
                 assert(called)
@@ -651,6 +651,51 @@ some line]],
             end,
             assert = function()
                 assert.are.equal(require('neoclip.settings').get().keys.telescope.i.select, '<c-a>')
+            end,
+        }
+    end)
+    it("length limit", function()
+        assert_scenario{
+            setup = function()
+                require('neoclip').setup({
+                    length_limit = 8,
+                })
+            end,
+            initial_buffer = [[1234
+567
+
+123456789
+]],
+            feedkeys = {
+                "yy",
+                "yj",
+                "y2j",
+                "3j",
+                "y8l",
+                "y9l",
+                "yy",
+            },
+            assert = function()
+                assert_equal_tables(
+                    {
+                        {
+                            contents = {"12345678"},
+                            filetype = "",
+                            regtype = "c"
+                        },
+                        {
+                            contents = {"1234", "567"},
+                            filetype = "",
+                            regtype = "l"
+                        },
+                        {
+                            contents = {"1234"},
+                            filetype = "",
+                            regtype = "l"
+                        },
+                    },
+                    require('neoclip.storage').get().yanks
+                )
             end,
         }
     end)

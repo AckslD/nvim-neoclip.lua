@@ -134,9 +134,13 @@ local function parse_extra(extra)
     return registers
 end
 
-local function map_if_set(map, mode, key, handler)
+local function map_if_set(map, mode, key, desc, handler)
     if key ~= nil then
-        map(mode, key, handler)
+        map(mode, key, setmetatable({desc}, {
+          __call = function(_, ...)
+            return handler(...)
+          end,
+        }))
     end
 end
 
@@ -174,11 +178,11 @@ local function get_export(register_names, typ)
             attach_mappings = function(_, map)
                 for _, mode in ipairs({'i', 'n'}) do
                     local keys = settings.keys.telescope[mode]
-                    map_if_set(map, mode, keys.select, get_set_register_handler(register_names))
-                    map_if_set(map, mode, keys.paste, get_paste_handler(register_names, 'p'))
-                    map_if_set(map, mode, keys.paste_behind, get_paste_handler(register_names, 'P'))
-                    map_if_set(map, mode, keys.replay, get_replay_recording_handler(register_names))
-                    map_if_set(map, mode, keys.delete, get_delete_handler(typ))
+                    map_if_set(map, mode, keys.select, 'select', get_set_register_handler(register_names))
+                    map_if_set(map, mode, keys.paste, 'paste', get_paste_handler(register_names, 'p'))
+                    map_if_set(map, mode, keys.paste_behind, 'paste_behind', get_paste_handler(register_names, 'P'))
+                    map_if_set(map, mode, keys.replay, 'replay', get_replay_recording_handler(register_names))
+                    map_if_set(map, mode, keys.delete, 'delete', get_delete_handler(typ))
                     if keys.custom ~= nil then
                         for key, action in pairs(keys.custom) do
                             map(mode, key, get_custom_action_handler(register_names, action))
