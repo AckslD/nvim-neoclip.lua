@@ -53,7 +53,7 @@ Oh, some more things, you can define an optional filter if you don’t want
 some things to be saved and custom actions to take.
 
 Hold on, `neoclip` optionally also supports persistent history between sessions
-powered by `sqlite.lua` <https://github.com/tami5/sqlite.lua>.
+powered by `sqlite.lua` <https://github.com/kkharji/sqlite.lua>.
 
 <div class="figure">
 <img src="https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png" title="fig:"/>
@@ -82,13 +82,13 @@ When `require('neoclip').setup()` is called, only the autocommand (for
 `telescope` is not required at this point if you lazy load it.
 
 If you want to use persistent history between sessions you also need
-`sqlite.lua` <https://github.com/tami5/sqlite.lua> installed, for example by:
+`sqlite.lua` <https://github.com/kkharji/sqlite.lua> installed, for example by:
 
 >
     use {
       "AckslD/nvim-neoclip.lua",
       requires = {
-        {'tami5/sqlite.lua', module = 'sqlite'},
+        {'kkharji/sqlite.lua', module = 'sqlite'},
         -- you'll need at least one of these
         -- {'nvim-telescope/telescope.nvim'},
         -- {'ibhagwan/fzf-lua'},
@@ -160,7 +160,7 @@ The following are the defaults and the keys are explained below:
 
 
 - `history`: The max number of entries to store (default 1000).
-- `enable_persistent_history`: If set to `true` the history is stored on `VimLeavePre` using `sqlite.lua` <https://github.com/tami5/sqlite.lua> and lazy loaded when querying.
+- `enable_persistent_history`: If set to `true` the history is stored on `VimLeavePre` using `sqlite.lua` <https://github.com/kkharji/sqlite.lua> and lazy loaded when querying.
 - `continuous_sync`: If set to `true`, the runtime history is synced with the persistent storage everytime it’s changed or queried.
     If you often use multiple sessions in parallel and wants the history synced you might want to enable this.
     Of by default cause it might cause delays since the history is written to file everytime you yank something.
