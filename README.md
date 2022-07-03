@@ -27,7 +27,7 @@ That's it!
 
 Oh, some more things, you can define an optional filter if you don't want some things to be saved and custom actions to take.
 
-Hold on, `neoclip` optionally also supports persistent history between sessions powered by [`sqlite.lua`](https://github.com/tami5/sqlite.lua).
+Hold on, `neoclip` optionally also supports persistent history between sessions powered by [`sqlite.lua`](https://github.com/kkharji/sqlite.lua).
 
 ![neoclip](https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png)
 
@@ -47,12 +47,12 @@ use {
 ```
 When `require('neoclip').setup()` is called, only the autocommand (for `TextYankPost` event) is setup to save yanked things. This means that `telescope` is not required at this point if you lazy load it.
 
-If you want to use persistent history between sessions you also need [`sqlite.lua`](https://github.com/tami5/sqlite.lua) installed, for example by:
+If you want to use persistent history between sessions you also need [`sqlite.lua`](https://github.com/kkharji/sqlite.lua) installed, for example by:
 ```lua
 use {
   "AckslD/nvim-neoclip.lua",
   requires = {
-    {'tami5/sqlite.lua', module = 'sqlite'},
+    {'kkharji/sqlite.lua', module = 'sqlite'},
     -- you'll need at least one of these
     -- {'nvim-telescope/telescope.nvim'},
     -- {'ibhagwan/fzf-lua'},
