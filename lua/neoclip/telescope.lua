@@ -134,12 +134,20 @@ local function parse_extra(extra)
     return registers
 end
 
-local function map_if_set(map, mode, key, desc, handler)
-    if key ~= nil then
+local function map_if_set(map, mode, keys, desc, handler)
+    if keys == nil then
+        return
+    end
+
+    if type(keys) ~= 'table' then
+        keys = { keys }
+    end
+
+    for _, key in pairs(keys) do
         map(mode, key, setmetatable({desc}, {
-          __call = function(_, ...)
-            return handler(...)
-          end,
+            __call = function(_, ...)
+                return handler(...)
+            end,
         }))
     end
 end

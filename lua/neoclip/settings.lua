@@ -77,12 +77,16 @@ local function check_deprecated_entries()
     check_persistant()
 end
 
+local function is_dict_like (tbl)
+    return type(tbl) == 'table' and not vim.tbl_islist(tbl)
+end
+
 local function setup(opts, subsettings)
     if opts == nil then
         opts = {}
     end
     for key, value in pairs(opts) do
-        if type(subsettings[key]) == 'table' then
+        if is_dict_like(subsettings[key]) then
             setup(value, subsettings[key])
         else
             subsettings[key] = value
