@@ -69,7 +69,7 @@ INSTALLATION                                            *neoclip-installation*
         -- you'll need at least one of these
         -- {'nvim-telescope/telescope.nvim'},
         -- {'ibhagwan/fzf-lua'},
-      }
+      },
       config = function()
         require('neoclip').setup()
       end,
@@ -92,7 +92,7 @@ If you want to use persistent history between sessions you also need
         -- you'll need at least one of these
         -- {'nvim-telescope/telescope.nvim'},
         -- {'ibhagwan/fzf-lua'},
-      }
+      },
       config = function()
         require('neoclip').setup()
       end,
