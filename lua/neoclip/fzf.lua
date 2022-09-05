@@ -55,7 +55,7 @@ local function make_actions(register_names)
         end
     end
     for key, _ in pairs(actions) do
-        if key == nil then
+        if not key then
             actions[key] = nil
         end
     end
