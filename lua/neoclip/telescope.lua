@@ -135,7 +135,7 @@ local function parse_extra(extra)
 end
 
 local function map_if_set(map, mode, keys, desc, handler)
-    if keys == nil then
+    if not keys then
         return
     end
 
