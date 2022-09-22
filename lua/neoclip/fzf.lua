@@ -1,7 +1,9 @@
 local handlers = require('neoclip.handlers')
-local storage = require('neoclip.storage').get().yanks
 local settings = require('neoclip.settings').get()
 local picker_utils = require('neoclip.picker_utils')
+
+-- This needs to be filled dynamically with each call (#80)
+local _storage = nil
 
 local function get_idx(item)
     return tonumber(item:match("^%d+%."))
@@ -9,7 +11,8 @@ end
 
 local function parse_entry(entry_str)
   local idx = get_idx(entry_str)
-  return storage[idx]
+  assert(_storage and _storage[idx])
+  return _storage[idx]
 end
 
 local function get_set_register_handler(register_names)
@@ -64,27 +67,26 @@ end
 
 -- Previewer class inherits from base previewer
 -- the only required method is 'populate_preview_buf'
-local Previewer = {}
-Previewer.base = require('fzf-lua.previewer.builtin').base
--- not necessarily needed
--- inheriting from 'buffer_or_file' give us access to filetype
--- detection and syntax highlighting helpers for file based previews
-Previewer.buffer_or_file = require('fzf-lua.previewer.builtin').buffer_or_file
+local Previewer = require('fzf-lua.previewer.builtin').base:extend()
 
 function Previewer:new(o, opts, fzf_win)
-  self = setmetatable(Previewer.base(o, opts, fzf_win), {
-    __index = vim.tbl_deep_extend("keep",
-      self, Previewer.base
-      -- only if you need access to specific file methods
-      -- self, Previewer.buffer_or_file, Previewer.base
-    )})
+  self.super.new(self, o, opts, fzf_win)
+  setmetatable(self, Previewer)
   return self
+end
+
+-- remove line numbering from preview buffer, comment
+-- entrire function or change 'number=true' to revert
+function Previewer:gen_winopts()
+  local winopts = {
+    wrap    = self.win.preview_wrap,
+    number  = false
+  }
+  return vim.tbl_extend("keep", winopts, self.winopts)
 end
 
 function Previewer:populate_preview_buf(entry_str)
   local entry = parse_entry(entry_str)
-  -- mark the buffer for unloading on next preview call
-  self.preview_bufloaded = true
   vim.api.nvim_buf_set_lines(self.preview_bufnr, 0, -1, false, entry.contents)
   vim.api.nvim_buf_set_option(self.preview_bufnr, 'filetype', entry.filetype)
   self.win:update_scrollbar()
@@ -94,10 +96,11 @@ end
 -- each call to `fzf_cb()` equals one line
 -- `fzf_cb(nil)` closes the pipe and marks EOL to fzf
 local fn = function(fzf_cb)
-    local i = 1
-    for _, e in ipairs(storage) do
+    -- reload current _storage local var, without
+    -- this call yanks are never refreshed (#80)
+    _storage = require('neoclip.storage').get().yanks
+    for i, e in ipairs(_storage) do
         fzf_cb(("%d. %s"):format(i, table.concat(e.contents, '\\n')))
-        i = i + 1
     end
     fzf_cb(nil)
 end
