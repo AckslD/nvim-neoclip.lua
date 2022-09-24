@@ -114,7 +114,7 @@ local function neoclip(register_names)
     end
     local actions = make_actions(register_names)
     require('fzf-lua').fzf_exec(fn, {
-      prompt = 'Prompt❯ ',
+      prompt = settings.prompt and settings.prompt or 'Prompt❯ ',
       previewer = Previewer,
       actions = actions,
       fzf_opts = {

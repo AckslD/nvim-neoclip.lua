@@ -78,6 +78,7 @@ use {
       db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
       filter = nil,
       preview = true,
+      prompt = nil,
       default_register = '"',
       default_register_macros = 'q',
       enable_macro_history = true,
