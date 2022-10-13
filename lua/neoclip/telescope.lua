@@ -177,6 +177,7 @@ local function get_export(register_names, typ)
         local results = storage.get({reversed = true})[typ]
         pickers.new(opts, {
             prompt_title = picker_utils.make_prompt_title(register_names),
+            prompt_prefix = settings.prompt or nil,
             finder = finders.new_table({
                 results = results,
                 entry_maker = entry_maker,
