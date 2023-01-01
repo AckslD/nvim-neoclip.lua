@@ -181,6 +181,7 @@ which when pressing `<space>` in normal mode will print something like:
 ```
 {
   register_names = { '"' },
+  typ = "yanks" -- Will be "macros" if selected from :Telescope macroscope
   entry = {
     contents = { "which when pressing `<space>` in normal mode will print something like:" },
     filetype = "markdown",

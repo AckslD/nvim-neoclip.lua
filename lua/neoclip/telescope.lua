@@ -48,12 +48,13 @@ local function get_replay_recording_handler(register_names)
     end
 end
 
-local function get_custom_action_handler(register_names, action)
+local function get_custom_action_handler(register_names, action, typ)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
         action({
             register_names=register_names,
+            typ = typ,
             entry = {
                 contents=entry.contents,
                 filetype=entry.filetype,
@@ -194,7 +195,7 @@ local function get_export(register_names, typ)
                     map_if_set(map, mode, keys.delete, 'delete', get_delete_handler(typ))
                     if keys.custom ~= nil then
                         for key, action in pairs(keys.custom) do
-                            map(mode, key, get_custom_action_handler(register_names, action))
+                            map(mode, key, get_custom_action_handler(register_names, action, typ))
                         end
                     end
                 end
