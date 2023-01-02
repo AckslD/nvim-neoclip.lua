@@ -16,7 +16,7 @@ local picker_utils = require('neoclip.picker_utils')
 
 local function refresh_entry_if_needed (typ, entry)
     if settings.refresh_entry_on_select then
-        storage.set_as_most_recent(entry, typ)
+        storage.set_as_most_recent(typ, entry)
     end
 end
 
