@@ -120,7 +120,7 @@ local function entry_maker(entry)
         regtype = entry.regtype,
         filetype = entry.filetype,
         ordinal = table.concat(entry.contents, '\n'),
-				db_entry = entry,
+        db_entry = entry,
         -- TODO seem to be needed
         name = 'name',
         value = 'value', -- TODO what to put value to, affects sorting?
