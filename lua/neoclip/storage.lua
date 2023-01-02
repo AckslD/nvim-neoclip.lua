@@ -51,6 +51,11 @@ M.insert = function(contents, typ)
     post_change()
 end
 
+M.set_as_most_recent = function (typ, entry)
+    M.delete(typ, entry)
+    M.insert(entry, typ)
+end
+
 local clear = function()
     for _, entries in pairs(storage) do
         entries:clear()

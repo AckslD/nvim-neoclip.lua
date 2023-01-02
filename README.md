@@ -83,6 +83,7 @@ use {
       default_register_macros = 'q',
       enable_macro_history = true,
       content_spec_column = false,
+      refresh_entry_on_select = false,
       on_paste = {
         set_reg = false,
       },
@@ -146,6 +147,7 @@ use {
 * `enable_macro_history`: If `true` (default) any recorded macro will be saved, see [macros](#macros).
 * `content_spec_colunm`: Can be set to `true` (default `false`) to use instead of the preview.
   It will only show the type and number of lines next to the first line of the entry.
+* `refresh_entry_on_select`: When selecting an entry via telescope or fzf, move the selection to the bottom.
 * `on_paste`:
   * `set_reg`: if the register should be populated when pressing the key to paste directly.
 * `on_replay`:

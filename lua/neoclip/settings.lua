@@ -12,6 +12,7 @@ local settings = {
     default_register_macros = 'q',
     enable_macro_history = true,
     content_spec_column = false,
+    refresh_entry_on_select = false,
     on_paste = {
         set_reg = false,
     },

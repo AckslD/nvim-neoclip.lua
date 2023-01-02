@@ -14,20 +14,28 @@ local settings = require('neoclip.settings').get()
 local utils = require('neoclip.utils')
 local picker_utils = require('neoclip.picker_utils')
 
-local function get_set_register_handler(register_names)
+local function refresh_entry_if_needed (typ, entry)
+    if settings.refresh_entry_on_select then
+        storage.set_as_most_recent(entry, typ)
+    end
+end
+
+local function get_set_register_handler(register_names, typ)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
+        refresh_entry_if_needed(typ, entry.db_entry)
         actions.close(prompt_bufnr)
         handlers.set_registers(register_names, entry)
     end
 end
 
-local function get_paste_handler(register_names, op)
+local function get_paste_handler(register_names, typ, op)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
         actions.close(prompt_bufnr)
+        refresh_entry_if_needed(typ, entry.db_entry)
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
         end
@@ -35,12 +43,13 @@ local function get_paste_handler(register_names, op)
     end
 end
 
-local function get_replay_recording_handler(register_names)
+local function get_replay_recording_handler(register_names, typ)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
         actions.close(prompt_bufnr)
+        refresh_entry_if_needed(typ, entry.db_entry)
         if settings.on_replay.set_reg then
             handlers.set_registers(register_names, entry)
         end
@@ -111,6 +120,7 @@ local function entry_maker(entry)
         regtype = entry.regtype,
         filetype = entry.filetype,
         ordinal = table.concat(entry.contents, '\n'),
+				db_entry = entry,
         -- TODO seem to be needed
         name = 'name',
         value = 'value', -- TODO what to put value to, affects sorting?
@@ -188,10 +198,10 @@ local function get_export(register_names, typ)
             attach_mappings = function(_, map)
                 for _, mode in ipairs({'i', 'n'}) do
                     local keys = settings.keys.telescope[mode]
-                    map_if_set(map, mode, keys.select, 'select', get_set_register_handler(register_names))
-                    map_if_set(map, mode, keys.paste, 'paste', get_paste_handler(register_names, 'p'))
-                    map_if_set(map, mode, keys.paste_behind, 'paste_behind', get_paste_handler(register_names, 'P'))
-                    map_if_set(map, mode, keys.replay, 'replay', get_replay_recording_handler(register_names))
+                    map_if_set(map, mode, keys.select, 'select', get_set_register_handler(register_names, typ))
+                    map_if_set(map, mode, keys.paste, 'paste', get_paste_handler(register_names, typ, 'p'))
+                    map_if_set(map, mode, keys.paste_behind, 'paste_behind', get_paste_handler(register_names, typ, 'P'))
+                    map_if_set(map, mode, keys.replay, 'replay', get_replay_recording_handler(register_names, typ))
                     map_if_set(map, mode, keys.delete, 'delete', get_delete_handler(typ))
                     if keys.custom ~= nil then
                         for key, action in pairs(keys.custom) do
