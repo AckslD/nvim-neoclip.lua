@@ -34,11 +34,11 @@ end
 local function get_paste_handler(register_names, op)
     return function(selected, _)
         local entry = parse_entry(selected[1])
+        handlers.paste(entry, op)
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
+            refresh_entry_if_needed(entry)
         end
-        handlers.paste(entry, op)
-        refresh_entry_if_needed(entry)
     end
 end
 
