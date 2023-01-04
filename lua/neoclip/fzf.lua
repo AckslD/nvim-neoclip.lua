@@ -6,7 +6,6 @@ local storage = require('neoclip.storage')
 -- This needs to be filled dynamically with each call (#80)
 local _storage = nil
 
-
 local function get_idx(item)
     return tonumber(item:match("^%d+%."))
 end
