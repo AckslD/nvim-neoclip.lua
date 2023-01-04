@@ -83,11 +83,16 @@ use {
       default_register_macros = 'q',
       enable_macro_history = true,
       content_spec_column = false,
+      on_select = {
+        move_to_front = false,
+      },
       on_paste = {
         set_reg = false,
+        move_to_front = false,
       },
       on_replay = {
         set_reg = false,
+        move_to_front = false,
       },
       keys = {
         telescope = {
@@ -144,12 +149,16 @@ use {
   Can be a string such as `'"'` (single register) or a table of strings such as `{'"', '+', '*'}`.
 * `default_register_macros`: What register to use for macros by default when not specified (e.g. `Telescope macroscope`).
 * `enable_macro_history`: If `true` (default) any recorded macro will be saved, see [macros](#macros).
-* `content_spec_colunm`: Can be set to `true` (default `false`) to use instead of the preview.
+* `content_spec_column`: Can be set to `true` (default `false`) to use instead of the preview.
   It will only show the type and number of lines next to the first line of the entry.
+* `on_select`:
+  * `move_to_front`: if the entry should be set as the lastest in the list when pressing the key to select a yank.
 * `on_paste`:
   * `set_reg`: if the register should be populated when pressing the key to paste directly.
+  * `move_to_front`: if the entry should be set as the lastest in the list when pressing the key to paste directly.
 * `on_replay`:
   * `set_reg`: if the register should be populated when pressing the key to replay a recorded macro.
+  * `move_to_front`: if the entry should be set as the lastest in the list when pressing the key to replay a recorded macro.
 * `keys`: keys to use for the different pickers (`telescope` and `fzf-lua`).
   With `telescope` normal key-syntax is supported and both insert `i` and normal mode `n`.
   With `fzf-lua` only insert mode is supported and `fzf`-style key-syntax needs to be used.

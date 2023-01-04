@@ -12,11 +12,16 @@ local settings = {
     default_register_macros = 'q',
     enable_macro_history = true,
     content_spec_column = false,
+    on_select = {
+        move_to_front = false,
+    },
     on_paste = {
         set_reg = false,
+        move_to_front = false,
     },
     on_replay = {
         set_reg = false,
+        move_to_front = false,
     },
     keys = {
         telescope = {

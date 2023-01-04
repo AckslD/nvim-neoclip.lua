@@ -1,6 +1,7 @@
 local handlers = require('neoclip.handlers')
 local settings = require('neoclip.settings').get()
 local picker_utils = require('neoclip.picker_utils')
+local storage = require('neoclip.storage')
 
 -- This needs to be filled dynamically with each call (#80)
 local _storage = nil
@@ -17,7 +18,11 @@ end
 
 local function get_set_register_handler(register_names)
     return function(selected, _)
-        handlers.set_registers(register_names, parse_entry(selected[1]))
+        local entry = parse_entry(selected[1])
+        handlers.set_registers(register_names, entry)
+        if settings.on_select.move_to_front then
+            storage.set_as_most_recent('yanks', entry)
+        end
     end
 end
 
@@ -28,6 +33,9 @@ local function get_paste_handler(register_names, op)
             handlers.set_registers(register_names, entry)
         end
         handlers.paste(entry, op)
+        if settings.on_paste.move_to_front then
+            storage.set_as_most_recent('yanks', entry)
+        end
     end
 end
 
