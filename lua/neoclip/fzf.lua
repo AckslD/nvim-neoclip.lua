@@ -12,7 +12,6 @@ local function refresh_entry_if_needed (entry)
     end
 end
 
-
 local function get_idx(item)
     return tonumber(item:match("^%d+%."))
 end
