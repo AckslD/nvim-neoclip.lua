@@ -23,9 +23,9 @@ end
 local function get_set_register_handler(register_names, typ)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
-        refresh_entry_if_needed(typ, entry.db_entry)
         actions.close(prompt_bufnr)
         handlers.set_registers(register_names, entry)
+        refresh_entry_if_needed(typ, entry.db_entry)
     end
 end
 
@@ -35,11 +35,11 @@ local function get_paste_handler(register_names, typ, op)
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
         actions.close(prompt_bufnr)
-        refresh_entry_if_needed(typ, entry.db_entry)
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
         end
         handlers.paste(entry, op)
+        refresh_entry_if_needed(typ, entry.db_entry)
     end
 end
 
@@ -49,11 +49,11 @@ local function get_replay_recording_handler(register_names, typ)
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
         actions.close(prompt_bufnr)
-        refresh_entry_if_needed(typ, entry.db_entry)
         if settings.on_replay.set_reg then
             handlers.set_registers(register_names, entry)
         end
         handlers.replay(entry)
+        refresh_entry_if_needed(typ, entry.db_entry)
     end
 end
 

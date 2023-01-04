@@ -37,8 +37,8 @@ local function get_paste_handler(register_names, op)
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
         end
-        refresh_entry_if_needed(entry)
         handlers.paste(entry, op)
+        refresh_entry_if_needed(entry)
     end
 end
 
