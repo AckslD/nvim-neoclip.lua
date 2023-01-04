@@ -14,16 +14,14 @@ local settings = require('neoclip.settings').get()
 local utils = require('neoclip.utils')
 local picker_utils = require('neoclip.picker_utils')
 
-local function refresh_entry_if_needed (typ, telescope_entry)
-    if settings.refresh_entry_on_select then
-        storage.set_as_most_recent(
-            typ,
-            {
-                regtype = telescope_entry.regtype,
-                contents = telescope_entry.contents
-            }
-        )
-    end
+local function move_entry_to_front (typ, telescope_entry)
+    storage.set_as_most_recent(
+        typ,
+        {
+            regtype = telescope_entry.regtype,
+            contents = telescope_entry.contents
+        }
+    )
 end
 
 local function get_set_register_handler(register_names, typ)
@@ -31,7 +29,9 @@ local function get_set_register_handler(register_names, typ)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
         handlers.set_registers(register_names, entry)
-        refresh_entry_if_needed(typ, entry)
+        if settings.on_select.move_to_front then
+            move_entry_to_front(typ, entry)
+        end
     end
 end
 
@@ -41,10 +41,12 @@ local function get_paste_handler(register_names, typ, op)
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
         actions.close(prompt_bufnr)
-        handlers.paste(entry, op)
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
-            refresh_entry_if_needed(typ, entry)
+        end
+        handlers.paste(entry, op)
+        if settings.on_paste.move_to_front then
+            move_entry_to_front(typ, entry)
         end
     end
 end
@@ -55,10 +57,12 @@ local function get_replay_recording_handler(register_names, typ)
         -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
         -- and have it optional
         actions.close(prompt_bufnr)
-        handlers.replay(entry)
         if settings.on_replay.set_reg then
             handlers.set_registers(register_names, entry)
-            refresh_entry_if_needed(typ, entry)
+        end
+        handlers.replay(entry)
+        if settings.on_replay.move_to_front then
+            move_entry_to_front(typ, entry)
         end
     end
 end

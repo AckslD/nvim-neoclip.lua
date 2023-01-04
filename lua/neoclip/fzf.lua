@@ -6,11 +6,6 @@ local storage = require('neoclip.storage')
 -- This needs to be filled dynamically with each call (#80)
 local _storage = nil
 
-local function refresh_entry_if_needed (entry)
-    if settings.refresh_entry_on_select then
-        storage.set_as_most_recent('yanks', entry)
-    end
-end
 
 local function get_idx(item)
     return tonumber(item:match("^%d+%."))
@@ -26,17 +21,21 @@ local function get_set_register_handler(register_names)
     return function(selected, _)
         local entry = parse_entry(selected[1])
         handlers.set_registers(register_names, entry)
-        refresh_entry_if_needed(entry)
+        if settings.on_select.move_to_front then
+            storage.set_as_most_recent('yanks', entry)
+        end
     end
 end
 
 local function get_paste_handler(register_names, op)
     return function(selected, _)
         local entry = parse_entry(selected[1])
-        handlers.paste(entry, op)
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
-            refresh_entry_if_needed(entry)
+        end
+        handlers.paste(entry, op)
+        if settings.on_paste.move_to_front then
+            storage.set_as_most_recent('yanks', entry)
         end
     end
 end
