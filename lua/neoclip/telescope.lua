@@ -14,9 +14,15 @@ local settings = require('neoclip.settings').get()
 local utils = require('neoclip.utils')
 local picker_utils = require('neoclip.picker_utils')
 
-local function refresh_entry_if_needed (typ, entry)
+local function refresh_entry_if_needed (typ, telescope_entry)
     if settings.refresh_entry_on_select then
-        storage.set_as_most_recent(typ, entry)
+        storage.set_as_most_recent(
+            typ,
+            {
+                regtype = telescope_entry.regtype,
+                contents = telescope_entry.contents
+            }
+        )
     end
 end
 
@@ -25,7 +31,7 @@ local function get_set_register_handler(register_names, typ)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
         handlers.set_registers(register_names, entry)
-        refresh_entry_if_needed(typ, entry.db_entry)
+        refresh_entry_if_needed(typ, entry)
     end
 end
 
@@ -38,7 +44,7 @@ local function get_paste_handler(register_names, typ, op)
         handlers.paste(entry, op)
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
-            refresh_entry_if_needed(typ, entry.db_entry)
+            refresh_entry_if_needed(typ, entry)
         end
     end
 end
@@ -52,7 +58,7 @@ local function get_replay_recording_handler(register_names, typ)
         handlers.replay(entry)
         if settings.on_replay.set_reg then
             handlers.set_registers(register_names, entry)
-            refresh_entry_if_needed(typ, entry.db_entry)
+            refresh_entry_if_needed(typ, entry)
         end
     end
 end
@@ -120,7 +126,6 @@ local function entry_maker(entry)
         regtype = entry.regtype,
         filetype = entry.filetype,
         ordinal = table.concat(entry.contents, '\n'),
-        db_entry = entry,
         -- TODO seem to be needed
         name = 'name',
         value = 'value', -- TODO what to put value to, affects sorting?
