@@ -95,8 +95,10 @@ end
 
 function Previewer:populate_preview_buf(entry_str)
   local entry = parse_entry(entry_str)
-  vim.api.nvim_buf_set_lines(self.preview_bufnr, 0, -1, false, entry.contents)
-  vim.api.nvim_buf_set_option(self.preview_bufnr, 'filetype', entry.filetype)
+  local tmpbuf = self:get_tmp_buffer()
+  vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, entry.contents)
+  vim.api.nvim_buf_set_option(tmpbuf, 'filetype', entry.filetype)
+  self:set_preview_buf(tmpbuf)
   self.win:update_scrollbar()
 end
 
