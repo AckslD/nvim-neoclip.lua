@@ -6,6 +6,13 @@ local function feedkeys(keys)
     vim.api.nvim_feedkeys(escape_keys(keys), 'xmt', true)
 end
 
+local function assert_buffer_contents (expected_contents)
+    return function ()
+        local current_buffer = vim.fn.join(vim.api.nvim_buf_get_lines(0, 0, -1, true), '\n')
+        assert.are.equal(expected_contents, current_buffer)
+    end
+end
+
 local function assert_scenario(scenario)
     if scenario.initial_buffer then
         vim.api.nvim_buf_set_lines(0, 0, -1, true, vim.fn.split(scenario.initial_buffer, '\n'))
@@ -15,6 +22,8 @@ local function assert_scenario(scenario)
         for _, raw_keys in ipairs(scenario.feedkeys) do
             if type(raw_keys) == 'string' then
                 feedkeys(raw_keys)
+            elseif type(raw_keys) == 'function' then
+                raw_keys()
             else
                 if raw_keys.before then raw_keys.before() end
                 feedkeys(raw_keys.keys)
@@ -25,8 +34,7 @@ local function assert_scenario(scenario)
     if scenario.interlude then scenario.interlude() end
     if scenario.assert then scenario.assert() end
     if scenario.expected_buffer then
-        local current_buffer = vim.fn.join(vim.api.nvim_buf_get_lines(0, 0, -1, true), '\n')
-        assert.are.equal(current_buffer, scenario.expected_buffer)
+        assert_buffer_contents(scenario.expected_buffer)()
     end
 end
 
@@ -763,6 +771,57 @@ Foo Bar bar foo
                     require('neoclip.storage').get().yanks
                 )
             end,
+        }
+    end)
+    it("telescope stays open", function()
+        assert_scenario{
+            setup = function ()
+                require('neoclip').setup({
+                    on_select = { close_telescope = false },
+                    on_paste = { close_telescope = false },
+                    on_replay = { close_telescope = false },
+                })
+            end,
+            initial_buffer = [[Some
+Text
+Is
+Here]],
+            feedkeys = {
+                "jyy", -- Go down a line and yank it
+                { -- Open telescope for yanks
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "i<c-p>", -- Paste the current entry
+                "i<c-p>", -- Paste it again (telescope should be open)
+                "<ESC>", -- Close telescope
+                assert_buffer_contents([[Some
+Text
+Text
+Text
+Is
+Here]]),
+                "qqraq", -- Record a macro that replaces a character to "a"
+                "qqrbq", -- Record another macro that replaces a character to "b"
+                "j$", -- Go to the end of the line below
+                { -- Open telescope for macroscope
+                    keys=[[:lua require('telescope').extensions.macroscope.macroscope()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "i<c-q>", -- Replay last macro (replace with "b")
+                "ki<c-q>", -- Replay first macro (replace with "a")
+                "<ESC>", -- Close telescope
+            },
+            expected_buffer = [[Some
+Text
+Text
+bext
+Ia
+Here]]
         }
     end)
 end)

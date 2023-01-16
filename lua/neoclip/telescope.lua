@@ -47,7 +47,9 @@ end
 local function get_set_register_handler(register_names, typ)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
-        actions.close(prompt_bufnr)
+        if settings.on_select.close_telescope then
+            actions.close(prompt_bufnr)
+        end
         handlers.set_registers(register_names, entry)
         if settings.on_select.move_to_front then
             move_entry_to_front(typ, entry)
@@ -55,32 +57,36 @@ local function get_set_register_handler(register_names, typ)
     end
 end
 
-local function get_paste_handler(register_names, typ, op)
+local function get_paste_handler(register_names, typ, op, last_focused_buffer)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
-        -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
-        -- and have it optional
-        actions.close(prompt_bufnr)
+        if settings.on_paste.close_telescope then
+            actions.close(prompt_bufnr)
+        end
         if settings.on_paste.set_reg then
             handlers.set_registers(register_names, entry)
         end
-        handlers.paste(entry, op)
+        vim.api.nvim_buf_call(last_focused_buffer, function ()
+            handlers.paste(entry, op)
+        end)
         if settings.on_paste.move_to_front then
             move_entry_to_front(typ, entry)
         end
     end
 end
 
-local function get_replay_recording_handler(register_names, typ)
+local function get_replay_recording_handler(register_names, typ, last_focused_buffer)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
-        -- TODO if we can know the bufnr "behind" telescope we wouldn't need to close
-        -- and have it optional
-        actions.close(prompt_bufnr)
+        if settings.on_replay.close_telescope then
+            actions.close(prompt_bufnr)
+        end
         if settings.on_replay.set_reg then
             handlers.set_registers(register_names, entry)
         end
-        handlers.replay(entry)
+        vim.api.nvim_buf_call(last_focused_buffer, function ()
+            handlers.replay(entry)
+        end)
         if settings.on_replay.move_to_front then
             move_entry_to_front(typ, entry)
         end
@@ -90,7 +96,9 @@ end
 local function get_custom_action_handler(register_names, action, typ)
     return function(prompt_bufnr)
         local entry = action_state.get_selected_entry()
-        actions.close(prompt_bufnr)
+        if settings.on_custom_action.close_telescope then
+            actions.close(prompt_bufnr)
+        end
         action({
             register_names=register_names,
             typ = typ,
@@ -248,6 +256,8 @@ local function get_export(register_names, typ)
             end
         end
 
+        local current_buffer = vim.api.nvim_get_current_buf()
+
         pickers.new(opts, {
             prompt_title = picker_utils.make_prompt_title(register_names),
             prompt_prefix = settings.prompt or nil,
@@ -261,9 +271,9 @@ local function get_export(register_names, typ)
                 for _, mode in ipairs({'i', 'n'}) do
                     local keys = settings.keys.telescope[mode]
                     map_if_set(map, mode, keys.select, 'select', get_set_register_handler(register_names, typ))
-                    map_if_set(map, mode, keys.paste, 'paste', get_paste_handler(register_names, typ, 'p'))
-                    map_if_set(map, mode, keys.paste_behind, 'paste_behind', get_paste_handler(register_names, typ, 'P'))
-                    map_if_set(map, mode, keys.replay, 'replay', get_replay_recording_handler(register_names, typ))
+                    map_if_set(map, mode, keys.paste, 'paste', get_paste_handler(register_names, typ, 'p', current_buffer))
+                    map_if_set(map, mode, keys.paste_behind, 'paste_behind', get_paste_handler(register_names, typ, 'P', current_buffer))
+                    map_if_set(map, mode, keys.replay, 'replay', get_replay_recording_handler(register_names, typ, current_buffer))
                     map_if_set(map, mode, keys.delete, 'delete', get_delete_handler(typ))
                     map_if_set(map, mode, keys.edit, 'edit', get_edit_handler(typ, opts))
                     if keys.custom ~= nil then
