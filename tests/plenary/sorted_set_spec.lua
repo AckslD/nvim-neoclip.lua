@@ -12,6 +12,12 @@ local bar = {
     filetype = 'lua',
 }
 
+local baz = {
+    regtype = 'c',
+    contents = {'baz'},
+    filetype = 'lua',
+}
+
 local foo_python = {
     regtype = 'c',
     contents = {'foo'},
@@ -102,5 +108,57 @@ describe("storage", function()
         assert_equal_tables(s:values(), {})
         s:insert(foo)
         assert_equal_tables(s:values(), {foo})
+    end)
+    it("replace", function()
+        local s = ss.new()
+        s:insert(bar)
+
+        local a = {
+            regtype = 'c',
+            contents = {'a'},
+            filetype = 'lua',
+        }
+        local b = {
+            regtype = 'c',
+            contents = {'b'},
+            filetype = 'lua',
+        }
+        local c = {
+            regtype = 'c',
+            contents = {'c'},
+            filetype = 'lua',
+        }
+
+        -- Replace with one item
+        s:replace(bar, foo)
+        assert_equal_tables(s:values(), {foo})
+
+        s:insert(bar)
+        s:insert(baz)
+        assert_equal_tables(s:values(), {foo, bar, baz})
+
+        -- Replace at head
+        s:replace(foo, a)
+        assert_equal_tables(s:values(), {a, bar, baz})
+
+        -- Replace at tail
+        s:replace(baz, c)
+        assert_equal_tables(s:values(), {a, bar, c})
+
+        -- Replace at middle
+        s:replace(bar, b)
+        assert_equal_tables(s:values(), {a, b, c})
+
+        -- Replace item that was previously replaced
+        s:replace(b, bar)
+        assert_equal_tables(s:values(), {a, bar, c})
+
+        -- Replace item with entry that already exists
+        s:replace(c, a)
+        assert_equal_tables(s:values(), {bar, a})
+
+        -- Replace item with itself
+        s:replace(a, a)
+        assert_equal_tables(s:values(), {bar, a})
     end)
 end)
