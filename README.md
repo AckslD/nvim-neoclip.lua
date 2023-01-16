@@ -102,6 +102,7 @@ use {
             paste_behind = '<c-k>',
             replay = '<c-q>',  -- replay a macro
             delete = '<c-d>',  -- delete an entry
+            edit = '<c-e>',  -- edit an entry
             custom = {},
           },
           n = {
@@ -112,6 +113,7 @@ use {
             paste_behind = 'P',
             replay = 'q',
             delete = 'd',
+            edit = 'e',
             custom = {},
           },
         },
@@ -295,6 +297,9 @@ If you don't want to use the setting `continuous_sync`, but still keep two insta
 
 ### Remove entries
 You can remove entries manually using the keybinds for `delete`. You can also delete the whole history with `:lua require('neoclip').clear_history()`.
+
+### Edit entries
+You can edit the contents of an entry using the keybinds for `edit`. It'll open the contents of the entry in a separate floating buffer. When you leave the buffer (`:q`), it'll update the contents of the entry with what's in the buffer.
 
 ## Tips
 * Duplicate yanks are not stored, but rather pushed forward in the history such that they are the first choice when searching for previous yanks.

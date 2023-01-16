@@ -47,6 +47,26 @@ local insert = function(self, entry, opts)
     end
 end
 
+local replace = function(self, entry, new_entry)
+    local key = hash(entry)
+    local new_key = hash(new_entry)
+    local node = self.entries[key];
+
+    if not node then
+        error("Attempted to replace entry that doesn't exist", 2)
+    end
+
+    node.value = new_entry -- Replace entry in node.
+
+    -- Prevent duplicate entries
+    if self.entries[new_key] and key ~= new_key then
+        self:remove(new_entry)
+    end
+
+    self.entries[key] = nil
+    self.entries[new_key] = node
+end
+
 --- adds the entries from a plain table
 local update = function(self, entries)
     for _, entry in ipairs(entries) do
@@ -82,6 +102,7 @@ M.new = function(max_size)
         entries = {},
         -- methods
         insert = insert,
+        replace = replace,
         update = update,
         remove = remove,
         values = values,
@@ -89,5 +110,7 @@ M.new = function(max_size)
         clear = clear,
     }
 end
+
+M.hash = hash
 
 return M

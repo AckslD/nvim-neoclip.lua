@@ -594,6 +594,7 @@ some line]],
                     paste_behind = '<c-c>',
                     replay = '<c-d>',
                     delete = '<c-e>',
+                    edit = '<c-e>',
                     custom = {
                         ['<c-f>'] = function(opts)
                             return opts
@@ -606,6 +607,7 @@ some line]],
                     paste_behind = 'c',
                     replay = 'd',
                     delete = 'e',
+                    edit = 'e',
                     custom = {
                         f = function(opts)
                             return opts
@@ -693,6 +695,70 @@ some line]],
                             filetype = "",
                             regtype = "l"
                         },
+                    },
+                    require('neoclip.storage').get().yanks
+                )
+            end,
+        }
+    end)
+    it("edit entry", function()
+        assert_scenario{
+            initial_buffer = [[This is some text
+This is also some text
+I like trains
+Foo Bar bar foo
+]],
+            feedkeys = {
+                -- Yank the four lines
+                "yy",
+                "j",
+                "yy",
+                "j",
+                "yy",
+                "j",
+                "yy",
+                -- Open telescope
+                {
+                    keys=[[:lua require('telescope').extensions.neoclip.neoclip()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "k", -- Select second entry (should be "I like trains")
+                "e", -- Edit the selected entry
+                "$ciw", -- Go to end of the line and change inner word
+                "aplanes", -- type "planes" in insert mode
+                ":q<CR>", -- quit
+                "<CR>", -- Select the entry
+            },
+            assert = function()
+                assert_equal_tables(
+                    {
+                        {
+                            contents = {"trains"},
+                            filetype = "",
+                            regtype = "c"
+                        },
+                        {
+                            contents = {"Foo Bar bar foo"},
+                            filetype = "",
+                            regtype = "l"
+                        },
+                        {
+                            contents = {"I like planes"},
+                            filetype = "",
+                            regtype = "l"
+                        },
+                        {
+                            contents = {"This is also some text"},
+                            filetype = "",
+                            regtype = "l"
+                        },
+                        {
+                            contents = {"This is some text"},
+                            filetype = "",
+                            regtype = "l"
+                        }
                     },
                     require('neoclip.storage').get().yanks
                 )

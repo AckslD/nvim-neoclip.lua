@@ -31,6 +31,7 @@ local settings = {
                 paste_behind = '<c-k>',
                 replay = '<c-q>',
                 delete = '<c-d>',
+                edit = '<c-e>',
                 custom = {},
             },
             n = {
@@ -39,6 +40,7 @@ local settings = {
                 paste_behind = 'P',
                 replay = 'q',
                 delete = 'd',
+                edit = 'e',
                 custom = {},
             },
         },

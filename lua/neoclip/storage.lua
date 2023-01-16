@@ -72,6 +72,11 @@ M.delete = function(typ, entry)
     post_change()
 end
 
+M.replace = function (typ, entry, newEntry)
+    storage[typ]:replace(entry, newEntry)
+    post_change()
+end
+
 M.push = function()
     require('neoclip.db').write(M.as_tbl())
 end

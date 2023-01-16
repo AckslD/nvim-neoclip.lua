@@ -10,6 +10,7 @@ local previewers = require('telescope.previewers')
 
 local handlers = require('neoclip.handlers')
 local storage = require('neoclip.storage')
+local sorted_set = require('neoclip.sorted_set')
 local settings = require('neoclip.settings').get()
 local utils = require('neoclip.utils')
 local picker_utils = require('neoclip.picker_utils')
@@ -22,6 +23,25 @@ local function move_entry_to_front (typ, telescope_entry)
             contents = telescope_entry.contents
         }
     )
+end
+
+--- Resume telescope, pre-selecting the modified item
+local function resume_telescope_at_entry (typ, telescope_opts, entry, index_hint)
+    if typ == 'yanks' then
+        require("telescope").extensions.neoclip.default(
+            vim.tbl_extend('force', telescope_opts or {}, {
+                open_at_entry = entry,
+                index_hint = index_hint
+            })
+        )
+    elseif typ == 'macros' then
+        require("telescope").extensions.macroscope.default(
+            vim.tbl_extend('force', telescope_opts or {}, {
+                open_at_entry = entry,
+                index_hint = index_hint
+            })
+        )
+    end
 end
 
 local function get_set_register_handler(register_names, typ)
@@ -89,6 +109,26 @@ local function get_delete_handler(typ)
         current_picker:delete_selection(function(selection)
             handlers.delete(typ, selection)
         end)
+    end
+end
+
+local function get_edit_handler (typ, telescope_opts)
+    return function(prompt_bufnr)
+        local entry = action_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        utils.open_editor_temp_window(
+            entry.contents,
+            entry.filetype,
+            function (new_lines)
+                local new_entry = {
+                    contents=new_lines,
+                    filetype=entry.filetype,
+                    regtype=entry.regtype,
+                }
+                storage.replace(typ, entry, new_entry)
+                resume_telescope_at_entry(typ, telescope_opts, new_entry, entry.index)
+            end
+        )
     end
 end
 
@@ -195,6 +235,19 @@ local function get_export(register_names, typ)
             register_names = utils.join(register_names, parse_extra(opts.extra))
         end
         local results = storage.get({reversed = true})[typ]
+
+        -- Tries to pre-select the entry given at `opts.open_at_entry`
+        if opts and opts.open_at_entry then
+            local target_hash = sorted_set.hash(opts.open_at_entry)
+            local start_index = opts.index_hint or 0
+            for index = start_index, #results, 1 do
+                if sorted_set.hash(results[index]) == target_hash then
+                    opts.default_selection_index = index
+                    break
+                end
+            end
+        end
+
         pickers.new(opts, {
             prompt_title = picker_utils.make_prompt_title(register_names),
             prompt_prefix = settings.prompt or nil,
@@ -212,6 +265,7 @@ local function get_export(register_names, typ)
                     map_if_set(map, mode, keys.paste_behind, 'paste_behind', get_paste_handler(register_names, typ, 'P'))
                     map_if_set(map, mode, keys.replay, 'replay', get_replay_recording_handler(register_names, typ))
                     map_if_set(map, mode, keys.delete, 'delete', get_delete_handler(typ))
+                    map_if_set(map, mode, keys.edit, 'edit', get_edit_handler(typ, opts))
                     if keys.custom ~= nil then
                         for key, action in pairs(keys.custom) do
                             map(mode, key, get_custom_action_handler(register_names, action, typ))
