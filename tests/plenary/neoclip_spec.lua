@@ -824,6 +824,33 @@ Ia
 Here]]
         }
     end)
+    it("transform macro to keycodes", function()
+        assert_scenario{
+            setup = function ()
+                require('neoclip').setup({ disable_keycodes_parsing = false })
+            end,
+            feedkeys = {
+                "qq", -- Start macro
+                "A<C-W>NEW<Esc>",
+                "q", -- Finish macro
+                { -- Open telescope for macro
+                    keys=[[:lua require('telescope').extensions.macroscope.macroscope()<CR>]],
+                    after = function()
+                        vim.wait(100, function() end)
+                    end,
+                },
+                "e", -- Open macro for edition
+                "yy", -- Yank the current macro text
+                ":q<CR>", -- Close edition window
+                "<ESC>", -- Close Telescope
+            },
+            assert = function ()
+                assert_equal_tables(require('neoclip.storage').get().yanks, {
+                    {regtype = "l", contents = {"A<C-W>NEW<Esc>" }, filetype = ""}
+                })
+            end,
+        }
+    end)
 end)
 
 -- TODO why does this needs it's own thing?

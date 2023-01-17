@@ -83,6 +83,7 @@ use {
       default_register_macros = 'q',
       enable_macro_history = true,
       content_spec_column = false,
+      disable_keycodes_parsing = false,
       on_select = {
         move_to_front = false,
         close_telescope = true,
@@ -158,6 +159,7 @@ use {
 * `default_register_macros`: What register to use for macros by default when not specified (e.g. `Telescope macroscope`).
 * `enable_macro_history`: If `true` (default) any recorded macro will be saved, see [macros](#macros).
 * `content_spec_column`: Can be set to `true` (default `false`) to use instead of the preview.
+* `disable_keycodes_parsing`: If set to `true` (default `false`), macroscope will display the internal byte representation, instead of a proper string that can be used in a `map`. So a macro like "`one<CR>two`" will be displayed as "`one\ntwo`"
   It will only show the type and number of lines next to the first line of the entry.
 * `on_select`:
   * `move_to_front`: if the entry should be set to last in the list when pressing the key to select a yank.

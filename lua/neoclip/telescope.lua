@@ -25,6 +25,25 @@ local function move_entry_to_front (typ, telescope_entry)
     )
 end
 
+local function macro_to_keycodes_if_needed (contents, typ)
+    if typ == "macros" and not settings.disable_keycodes_parsing then
+        return vim.tbl_map(vim.fn.keytrans, contents)
+    end
+    return contents
+end
+
+local function keycodes_to_macro_if_needed (contents, typ)
+    if typ == "macros" and not settings.disable_keycodes_parsing then
+        return vim.tbl_map(
+            function (val)
+                return vim.api.nvim_replace_termcodes(val, true, true, true)
+            end,
+            contents
+        )
+    end
+    return contents
+end
+
 --- Resume telescope, pre-selecting the modified item
 local function resume_telescope_at_entry (typ, telescope_opts, entry, index_hint)
     if typ == 'yanks' then
@@ -125,11 +144,11 @@ local function get_edit_handler (typ, telescope_opts)
         local entry = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
         utils.open_editor_temp_window(
-            entry.contents,
+            macro_to_keycodes_if_needed(entry.contents, typ),
             entry.filetype,
             function (new_lines)
                 local new_entry = {
-                    contents=new_lines,
+                    contents=keycodes_to_macro_if_needed(new_lines, typ),
                     filetype=entry.filetype,
                     regtype=entry.regtype,
                 }
@@ -163,25 +182,31 @@ local function spec_from_entry(entry)
     return spec
 end
 
-local function make_display(entry)
-    local to_display = {entry.contents[1]}
+local function make_display(entry, typ)
+    local to_display = { macro_to_keycodes_if_needed(entry.contents, typ)[1] }
     if settings.content_spec_column then
         table.insert(to_display, {spec_from_entry(entry), "Comment"})
     end
     return displayer(to_display)
 end
 
-local function entry_maker(entry)
-    return {
-        display = make_display,
-        contents = entry.contents,
-        regtype = entry.regtype,
-        filetype = entry.filetype,
-        ordinal = table.concat(entry.contents, '\n'),
-        -- TODO seem to be needed
-        name = 'name',
-        value = 'value', -- TODO what to put value to, affects sorting?
-    }
+local function make_entry_maker(typ)
+    return function (entry)
+        local display = function (e)
+            return make_display(e, typ)
+        end
+
+        return {
+            display = display,
+            contents = entry.contents,
+            regtype = entry.regtype,
+            filetype = entry.filetype,
+            ordinal = table.concat(entry.contents, '\n'),
+            -- TODO seem to be needed
+            name = 'name',
+            value = 'value', -- TODO what to put value to, affects sorting?
+        }
+    end
 end
 
 local special_registers = {
@@ -229,7 +254,8 @@ local function get_export(register_names, typ)
         if settings.preview then
             previewer = previewers.new_buffer_previewer({
                 define_preview = function(self, entry, status)
-                    vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, true, entry.contents)
+                    local contents = macro_to_keycodes_if_needed(entry.contents, typ)
+                    vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, true, contents)
                     if entry.filetype ~= nil then
                         vim.bo[self.state.bufnr].filetype = entry.filetype
                     end
@@ -263,7 +289,7 @@ local function get_export(register_names, typ)
             prompt_prefix = settings.prompt or nil,
             finder = finders.new_table({
                 results = results,
-                entry_maker = entry_maker,
+                entry_maker = make_entry_maker(typ),
             }),
             previewer = previewer,
             sorter = config.generic_sorter(opts),
