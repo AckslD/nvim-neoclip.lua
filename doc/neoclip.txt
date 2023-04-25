@@ -4,13 +4,13 @@
 Table of Contents                                  *neoclip-table-of-contents*
 
 1. nvim-neoclip.lua                                 |neoclip-nvim-neoclip.lua|
-  - Installation                                        |neoclip-installation|
-  - Configuration                                      |neoclip-configuration|
-  - Usage                                                      |neoclip-usage|
-  - Tips                                                        |neoclip-tips|
-  - Troubleshooting                                  |neoclip-troubleshooting|
-  - Thanks                                                    |neoclip-thanks|
-  - Screenshots                                          |neoclip-screenshots|
+  - Installation                       |neoclip-nvim-neoclip.lua-installation|
+  - Configuration                     |neoclip-nvim-neoclip.lua-configuration|
+  - Usage                                     |neoclip-nvim-neoclip.lua-usage|
+  - Tips                                       |neoclip-nvim-neoclip.lua-tips|
+  - Troubleshooting                 |neoclip-nvim-neoclip.lua-troubleshooting|
+  - Thanks                                   |neoclip-nvim-neoclip.lua-thanks|
+  - Screenshots                         |neoclip-nvim-neoclip.lua-screenshots|
 
 ==============================================================================
 1. nvim-neoclip.lua                                 *neoclip-nvim-neoclip.lua*
@@ -30,7 +30,6 @@ _This is what happens to Bob everyday_ 🚧:
 - _Bob yanks another line._ 🤔
 - _Bob realises he actually wanted the first._ 🙁
 - _But it is gone and Bob is now sad._ 😢
-
 
 _Don’t be like Bob, use neoclip!_ 🎉
 
@@ -55,14 +54,10 @@ some things to be saved and custom actions to take.
 Hold on, `neoclip` optionally also supports persistent history between sessions
 powered by `sqlite.lua` <https://github.com/kkharji/sqlite.lua>.
 
-<div class="figure">
-<img src="https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png" title="fig:"/>
-<p class="caption">neoclip</p>
-</div>
 
-INSTALLATION                                            *neoclip-installation*
+INSTALLATION                           *neoclip-nvim-neoclip.lua-installation*
 
->
+>lua
     use {
       "AckslD/nvim-neoclip.lua",
       requires = {
@@ -76,15 +71,16 @@ INSTALLATION                                            *neoclip-installation*
     }
 <
 
-
 When `require('neoclip').setup()` is called, only the autocommand (for
 `TextYankPost` event) is setup to save yanked things. This means that
-`telescope` is not required at this point if you lazy load it.
+`telescope` is not required at this point if you lazy load it. Depending on
+your setup you might need to load the telescope extension before using it
+though, see |neoclip-|.
 
 If you want to use persistent history between sessions you also need
 `sqlite.lua` <https://github.com/kkharji/sqlite.lua> installed, for example by:
 
->
+>lua
     use {
       "AckslD/nvim-neoclip.lua",
       requires = {
@@ -100,12 +96,12 @@ If you want to use persistent history between sessions you also need
 <
 
 
-CONFIGURATION                                          *neoclip-configuration*
+CONFIGURATION                         *neoclip-nvim-neoclip.lua-configuration*
 
 You can configure `neoclip` by passing a table to `setup` (all are optional).
 The following are the defaults and the keys are explained below:
 
->
+>lua
     use {
       "AckslD/nvim-neoclip.lua",
       config = function()
@@ -175,7 +171,6 @@ The following are the defaults and the keys are explained below:
 <
 
 
-
 - `history`: The max number of entries to store (default 1000).
 - `enable_persistent_history`: If set to `true` the history is stored on `VimLeavePre` using `sqlite.lua` <https://github.com/kkharji/sqlite.lua> and lazy loaded when querying.
 - `length_limit`: The max number of characters of an entry to be stored (default 1MiB). If the length of the yanked string is larger than the limit, it will not be stored.
@@ -220,15 +215,15 @@ The following are the defaults and the keys are explained below:
     You can also use the `custom` entry to specify custom actions to take on certain key-presses, see |neoclip-below| for more details.
     NOTE: these are only set in the `telescope` buffer and you need to setup your own keybindings to for example open `telescope`.
 
-
 See screenshot section below for how the settings above might affect the looks.
+
 
 CUSTOM ACTIONS ~
 
 You can specify custom actions in the `keys` entry in the settings. For example
 you can do:
 
->
+>lua
     require('neoclip').setup({
       ...
       keys = {
@@ -245,7 +240,6 @@ you can do:
     })
 <
 
-
 which when pressing `<space>` in normal mode will print something like:
 
 >
@@ -260,11 +254,10 @@ which when pressing `<space>` in normal mode will print something like:
     }
 <
 
-
 to do your custom action and also populate a register and/or paste you can call
 `neoclip`s built-in handlers, such as:
 
->
+>lua
     require('neoclip').setup({
       ...
       keys = {
@@ -290,23 +283,22 @@ to do your custom action and also populate a register and/or paste you can call
 <
 
 
-USAGE                                                          *neoclip-usage*
+USAGE                                         *neoclip-nvim-neoclip.lua-usage*
+
 
 YANKS ~
 
 Yank all you want and then do:
 
->
+>vim
     :Telescope neoclip
 <
 
-
 if using `telescope` or
 
->
+>vim
     :lua require('neoclip.fzf')()
 <
-
 
 if using `fzf-lua`, which will show you a history of the yanks that happened in
 the current session. If you pick (default `<cr>`) one this will then replace
@@ -319,17 +311,15 @@ respectively.
 If you want to replace another register with an entry from the history you can
 do for example:
 
->
+>vim
     :Telescope neoclip a
 <
 
-
 if using `telescope` or
 
->
+>vim
     :lua require('neoclip.fzf')('a')
 <
-
 
 if using `fzf-lua`, which will replace register `a`. The register `[0-9a-z]`
 and `default` (`"`) are supported.
@@ -344,37 +334,34 @@ You can also specify more registers to populate in a single command with the
 `extra` keyword argument which supports registers separated by comma, for
 example:
 
->
+>vim
     :Telescope neoclip a extra=star,plus,b
 <
 
-
 if using `telescope` or
 
->
+>vim
     :lua require('neoclip.fzf')({'a', 'star', 'plus', 'b'})
 <
 
-
 if using `fzf-lua`.
+
 
 MACROS ~
 
 If `enable_macro_history` is set to `true` (default) in the |neoclip-`setup`|
 then any recorded macro will be stored and can later be accessed using:
 
->
+>vim
     :Telescope macroscope
 <
-
 
 or equivalently (which is probably the better way if you’re lazy loading
 `telescope`):
 
->
+>vim
     :lua require('telescope').extensions.macroscope.default()
 <
-
 
 The same arguments are supported as for the `neoclip` extension.
 
@@ -384,11 +371,13 @@ supports this by checking that `:echo exists('##RecordingLeave')` returns `1`.
 If not then everything will work normally except that no macro will be saved in
 the history of `neoclip`.
 
+
 START/STOP ~
 
 If you temporarily don’t want `neoclip` to record anything you can use the
 following calls: * `:lua require('neoclip').start()` * `:lua
 require('neoclip').stop()` * `:lua require('neoclip').toggle()`
+
 
 SYNC DATABASE ~
 
@@ -399,10 +388,12 @@ functions: * `:lua require('neoclip').db_pull()`: Pulls the database
 require('neoclip').db_push()`: Pushes to the database (overwrites any history
 previous saved in the database).
 
+
 REMOVE ENTRIES ~
 
 You can remove entries manually using the keybinds for `delete`. You can also
 delete the whole history with `:lua require('neoclip').clear_history()`.
+
 
 EDIT ENTRIES ~
 
@@ -411,7 +402,8 @@ open the contents of the entry in a separate floating buffer. When you leave
 the buffer (`:q`), it’ll update the contents of the entry with what’s in
 the buffer.
 
-TIPS                                                            *neoclip-tips*
+
+TIPS                                           *neoclip-nvim-neoclip.lua-tips*
 
 
 - Duplicate yanks are not stored, but rather pushed forward in the history such
@@ -431,7 +423,7 @@ TIPS                                                            *neoclip-tips*
     calling the extension.
 - If you don’t want to store pure whitespace yanks you could specify a filter
     as:
-    >
+    >lua
         local function is_whitespace(line)
           return vim.fn.match(line, [[^\s*$]]) ~= -1
         end
@@ -455,7 +447,7 @@ TIPS                                                            *neoclip-tips*
     <
 
 
-TROUBLESHOOTING                                      *neoclip-troubleshooting*
+TROUBLESHOOTING                     *neoclip-nvim-neoclip.lua-troubleshooting*
 
 
 - For some plugin managers it seems necessary to do
@@ -473,36 +465,35 @@ TROUBLESHOOTING                                      *neoclip-troubleshooting*
     to `PackerCompile` after adding the plugin.
 
 
-THANKS                                                        *neoclip-thanks*
+THANKS                                       *neoclip-nvim-neoclip.lua-thanks*
 
 
-- Thanks cdow for the inspiration with `clipmenu` <https://github.com/cdown/clipmenu>.
-- Thanks fdschmidt9 for help understanding some `telescope` <https://github.com/nvim-telescope/telescope.nvim> concepts.
-- Thanks ibhagwa for providing the code example to support `fzf-lua` <https://github.com/ibhagwan/fzf-lua>.
+- Thanks @cdown for the inspiration with `clipmenu` <https://github.com/cdown/clipmenu>.
+- Thanks @fdschmidt93 for help understanding some `telescope` <https://github.com/nvim-telescope/telescope.nvim> concepts.
+- Thanks @ibhagwan for providing the code example to support `fzf-lua` <https://github.com/ibhagwan/fzf-lua>.
 
 
-SCREENSHOTS                                              *neoclip-screenshots*
+SCREENSHOTS                             *neoclip-nvim-neoclip.lua-screenshots*
 
-`PREVIEW = TRUE` AND `CONTENT_SPEC_COLUMN = FALSE` ~
 
-<div class="figure">
-<img src="https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png" title="fig:"/>
-<p class="caption">preview</p>
-</div>
+PREVIEW = TRUE AND CONTENT_SPEC_COLUMN = FALSE ~
 
-`PREVIEW = FALSE` AND `CONTENT_SPEC_COLUMN = TRUE` ~
 
-<div class="figure">
-<img src="https://user-images.githubusercontent.com/23341710/140090472-3271affa-7efd-40bd-9d20-562b2074b261.png" title="fig:"/>
-<p class="caption">content_spec_column</p>
-</div>
+PREVIEW = FALSE AND CONTENT_SPEC_COLUMN = TRUE ~
 
-`PREVIEW = FALSE` AND `CONTENT_SPEC_COLUMN = FALSE` ~
 
-<div class="figure">
-<img src="https://user-images.githubusercontent.com/23341710/140090327-30bfff28-83ff-4695-82b8-8d4abfd68546.png" title="fig:"/>
-<p class="caption">clean</p>
-</div>
+PREVIEW = FALSE AND CONTENT_SPEC_COLUMN = FALSE ~
+
+==============================================================================
+2. Links                                                       *neoclip-links*
+
+1. *neoclip*: https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png
+2. *@cdown*: 
+3. *@fdschmidt93*: 
+4. *@ibhagwan*: 
+5. *preview*: https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png
+6. *content_spec_column*: https://user-images.githubusercontent.com/23341710/140090472-3271affa-7efd-40bd-9d20-562b2074b261.png
+7. *clean*: https://user-images.githubusercontent.com/23341710/140090327-30bfff28-83ff-4695-82b8-8d4abfd68546.png
 
 Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 
