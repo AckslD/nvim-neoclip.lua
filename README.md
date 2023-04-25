@@ -45,7 +45,7 @@ use {
   end,
 }
 ```
-When `require('neoclip').setup()` is called, only the autocommand (for `TextYankPost` event) is setup to save yanked things. This means that `telescope` is not required at this point if you lazy load it. Depending on your setup you might need to load the telescope extension before using it though, see [](#troubleshooting).
+When `require('neoclip').setup()` is called, only the autocommand (for `TextYankPost` event) is setup to save yanked things. This means that `telescope` is not required at this point if you lazy load it. Depending on your setup you might need to load the telescope extension before using it though, see the [troubleshooting](#troubleshooting)-section below.
 
 If you want to use persistent history between sessions you also need [`sqlite.lua`](https://github.com/kkharji/sqlite.lua) installed, for example by:
 ```lua
