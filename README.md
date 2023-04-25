@@ -356,6 +356,7 @@ You can edit the contents of an entry using the keybinds for `edit`. It'll open 
 * Thanks @cdown for the inspiration with [`clipmenu`](https://github.com/cdown/clipmenu).
 * Thanks @fdschmidt93 for help understanding some [`telescope`](https://github.com/nvim-telescope/telescope.nvim) concepts.
 * Thanks @ibhagwan for providing the code example to support [`fzf-lua`](https://github.com/ibhagwan/fzf-lua).
+* Thanks @kkharji for all the great help getting the persistent storage with [`sqlite.lua`](https://github.com/kkharji/sqlite.lua) working.
 
 ## Screenshots
 ### `preview = true` and `content_spec_column = false`
