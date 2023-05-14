@@ -2,13 +2,6 @@ local M = {}
 
 local ll = require('neoclip.linked_list')
 
-local hash = function(entry)
-    return vim.inspect({
-        regtype = entry.regtype,
-        contents = entry.contents,
-    })
-end
-
 local remove_by_key = function(self, key)
     local node = self.entries[key]
     self.ll:remove(node)
@@ -16,7 +9,7 @@ local remove_by_key = function(self, key)
 end
 
 local _insert = function(self, entry, opts)
-    local key = hash(entry)
+    local key = self.hash(entry)
     if self.entries[key] then
         if opts and opts.keep_position then
             return
@@ -31,7 +24,7 @@ end
 local pop = function(self)
     local entry = self.ll:pop()
     if entry then
-        self.entries[hash(entry)] = nil
+        self.entries[self.hash(entry)] = nil
     end
     return entry
 end
@@ -48,8 +41,8 @@ local insert = function(self, entry, opts)
 end
 
 local replace = function(self, entry, new_entry)
-    local key = hash(entry)
-    local new_key = hash(new_entry)
+    local key = self.hash(entry)
+    local new_key = self.hash(new_entry)
     local node = self.entries[key];
 
     if not node then
@@ -76,7 +69,7 @@ end
 
 --- removes an entry by value
 local remove = function(self, entry)
-    remove_by_key(self, hash(entry))
+    remove_by_key(self, self.hash(entry))
 end
 
 --- returns a plain table with then entries
@@ -95,9 +88,22 @@ local clear = function(self)
     self.entries = {}
 end
 
-M.new = function(max_size)
+--- check if an entry is in the set
+local contains = function(self, entry)
+  return self.entries[self.hash(entry)] ~= nil
+end
+
+M.hash = function(entry)
+    return vim.inspect({
+        regtype = entry.regtype,
+        contents = entry.contents,
+    })
+end
+
+M.new = function(opts)
+    opts = opts or {}
     return {
-        max_size = max_size,
+        max_size = opts.max_size,
         ll = ll:new(),
         entries = {},
         -- methods
@@ -108,9 +114,9 @@ M.new = function(max_size)
         values = values,
         len = len,
         clear = clear,
+        contains = contains,
+        hash = opts.hash or M.hash,
     }
 end
-
-M.hash = hash
 
 return M
