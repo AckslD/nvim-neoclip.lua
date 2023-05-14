@@ -66,7 +66,7 @@ describe("storage", function()
     end)
     it("max size", function()
         local max_size = 2
-        local s = ss.new(max_size)
+        local s = ss.new({max_size = max_size})
         local a = {
             regtype = 'c',
             contents = {'a'},

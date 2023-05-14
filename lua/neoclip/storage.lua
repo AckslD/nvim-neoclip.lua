@@ -4,8 +4,8 @@ local ss = require('neoclip.sorted_set')
 local settings = require('neoclip.settings').get()
 
 local storage = {
-    yanks = ss.new(settings.history),
-    macros = ss.new(settings.history),
+    yanks = ss.new({max_size = settings.history}),
+    macros = ss.new({max_size = settings.history}),
 }
 
 local update_from_tbl = function(tbl)
