@@ -12,6 +12,7 @@ local settings = {
     default_register_macros = 'q',
     enable_macro_history = true,
     content_spec_column = false,
+    disable_keycodes_parsing = false,
     on_select = {
         move_to_front = false,
         close_telescope = true,
