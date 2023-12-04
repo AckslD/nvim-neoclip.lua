@@ -5,6 +5,9 @@ local storage = require('neoclip.storage')
 local settings = require('neoclip.settings').get()
 
 local function should_add(event)
+    if event.regcontents == nil then
+      return false
+    end
     if settings.length_limit then
         local length = #event.regcontents - 1
         for _,line in ipairs(event.regcontents) do
