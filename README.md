@@ -35,7 +35,7 @@ Hold on, `neoclip` optionally also supports persistent history between sessions 
 ```lua
 use {
   "AckslD/nvim-neoclip.lua",
-  requires = {
+  dependencies = {
     -- you'll need at least one of these
     -- {'nvim-telescope/telescope.nvim'},
     -- {'ibhagwan/fzf-lua'},
@@ -51,7 +51,7 @@ If you want to use persistent history between sessions you also need [`sqlite.lu
 ```lua
 use {
   "AckslD/nvim-neoclip.lua",
-  requires = {
+  dependencies = {
     {'kkharji/sqlite.lua', module = 'sqlite'},
     -- you'll need at least one of these
     -- {'nvim-telescope/telescope.nvim'},
