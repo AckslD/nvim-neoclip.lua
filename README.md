@@ -32,8 +32,30 @@ Hold on, `neoclip` optionally also supports persistent history between sessions 
 ![neoclip](https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png)
 
 ## Installation
+
+<details>
+    <summary>Using <a href="https://github.com/folke/lazy.nvim">Lazy.nvim</a></summary>
+
 ```lua
-use {
+require {
+  "AckslD/nvim-neoclip.lua",
+  dependencies = {
+    -- you'll need at least one of these
+    -- {'nvim-telescope/telescope.nvim'},
+    -- {'ibhagwan/fzf-lua'},
+  },
+  config = function()
+    require('neoclip').setup()
+  end,
+}
+```
+</details>
+
+<details>
+    <summary>Using <a href="https://github.com/wbthomason/packer.nvim">Packer</a></summary>
+
+```lua
+{
   "AckslD/nvim-neoclip.lua",
   requires = {
     -- you'll need at least one of these
@@ -45,11 +67,39 @@ use {
   end,
 }
 ```
+</details>
+
+<br>
+
 When `require('neoclip').setup()` is called, only the autocommand (for `TextYankPost` event) is setup to save yanked things. This means that `telescope` is not required at this point if you lazy load it. Depending on your setup you might need to load the telescope extension before using it though, see the [troubleshooting](#troubleshooting)-section below.
 
 If you want to use persistent history between sessions you also need [`sqlite.lua`](https://github.com/kkharji/sqlite.lua) installed, for example by:
+
+<details>
+    <summary>Using <a href="https://github.com/folke/lazy.nvim">Lazy.nvim</a></summary>
+
 ```lua
-use {
+require {
+  "AckslD/nvim-neoclip.lua",
+  dependencies = {
+    {'kkharji/sqlite.lua', module = 'sqlite'},
+    -- you'll need at least one of these
+    -- {'nvim-telescope/telescope.nvim'},
+    -- {'ibhagwan/fzf-lua'},
+  },
+  config = function()
+    require('neoclip').setup()
+  end,
+}
+```
+
+</details>
+
+<details>
+    <summary>Using <a href="https://github.com/wbthomason/packer.nvim">Packer</a></summary>
+
+```lua
+{
   "AckslD/nvim-neoclip.lua",
   requires = {
     {'kkharji/sqlite.lua', module = 'sqlite'},
@@ -63,11 +113,13 @@ use {
 }
 ```
 
+</details>
+
 ## Configuration
 You can configure `neoclip` by passing a table to `setup` (all are optional).
 The following are the defaults and the keys are explained below:
 ```lua
-use {
+{
   "AckslD/nvim-neoclip.lua",
   config = function()
     require('neoclip').setup({
