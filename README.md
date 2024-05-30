@@ -55,7 +55,7 @@ require {
     <summary>Using <a href="https://github.com/wbthomason/packer.nvim">Packer</a></summary>
 
 ```lua
-{
+use {
   "AckslD/nvim-neoclip.lua",
   requires = {
     -- you'll need at least one of these
@@ -99,7 +99,7 @@ require {
     <summary>Using <a href="https://github.com/wbthomason/packer.nvim">Packer</a></summary>
 
 ```lua
-{
+use {
   "AckslD/nvim-neoclip.lua",
   requires = {
     {'kkharji/sqlite.lua', module = 'sqlite'},
