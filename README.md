@@ -32,6 +32,28 @@ Hold on, `neoclip` optionally also supports persistent history between sessions 
 ![neoclip](https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png)
 
 ## Installation
+
+<details>
+    <summary>Using <a href="https://github.com/folke/lazy.nvim">Lazy.nvim</a></summary>
+
+```lua
+require {
+  "AckslD/nvim-neoclip.lua",
+  dependencies = {
+    -- you'll need at least one of these
+    -- {'nvim-telescope/telescope.nvim'},
+    -- {'ibhagwan/fzf-lua'},
+  },
+  config = function()
+    require('neoclip').setup()
+  end,
+}
+```
+</details>
+
+<details>
+    <summary>Using <a href="https://github.com/wbthomason/packer.nvim">Packer</a></summary>
+
 ```lua
 use {
   "AckslD/nvim-neoclip.lua",
@@ -45,9 +67,37 @@ use {
   end,
 }
 ```
+</details>
+
+<br>
+
 When `require('neoclip').setup()` is called, only the autocommand (for `TextYankPost` event) is setup to save yanked things. This means that `telescope` is not required at this point if you lazy load it. Depending on your setup you might need to load the telescope extension before using it though, see the [troubleshooting](#troubleshooting)-section below.
 
 If you want to use persistent history between sessions you also need [`sqlite.lua`](https://github.com/kkharji/sqlite.lua) installed, for example by:
+
+<details>
+    <summary>Using <a href="https://github.com/folke/lazy.nvim">Lazy.nvim</a></summary>
+
+```lua
+require {
+  "AckslD/nvim-neoclip.lua",
+  dependencies = {
+    {'kkharji/sqlite.lua', module = 'sqlite'},
+    -- you'll need at least one of these
+    -- {'nvim-telescope/telescope.nvim'},
+    -- {'ibhagwan/fzf-lua'},
+  },
+  config = function()
+    require('neoclip').setup()
+  end,
+}
+```
+
+</details>
+
+<details>
+    <summary>Using <a href="https://github.com/wbthomason/packer.nvim">Packer</a></summary>
+
 ```lua
 use {
   "AckslD/nvim-neoclip.lua",
@@ -63,77 +113,75 @@ use {
 }
 ```
 
+</details>
+
 ## Configuration
 You can configure `neoclip` by passing a table to `setup` (all are optional).
 The following are the defaults and the keys are explained below:
 ```lua
-use {
-  "AckslD/nvim-neoclip.lua",
-  config = function()
-    require('neoclip').setup({
-      history = 1000,
-      enable_persistent_history = false,
-      length_limit = 1048576,
-      continuous_sync = false,
-      db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
-      filter = nil,
-      preview = true,
-      prompt = nil,
-      default_register = '"',
-      default_register_macros = 'q',
-      enable_macro_history = true,
-      content_spec_column = false,
-      disable_keycodes_parsing = false,
-      on_select = {
-        move_to_front = false,
-        close_telescope = true,
-      },
-      on_paste = {
-        set_reg = false,
-        move_to_front = false,
-        close_telescope = true,
-      },
-      on_replay = {
-        set_reg = false,
-        move_to_front = false,
-        close_telescope = true,
-      },
-      on_custom_action = {
-        close_telescope = true,
-      },
-      keys = {
-        telescope = {
-          i = {
-            select = '<cr>',
-            paste = '<c-p>',
-            paste_behind = '<c-k>',
-            replay = '<c-q>',  -- replay a macro
-            delete = '<c-d>',  -- delete an entry
-            edit = '<c-e>',  -- edit an entry
-            custom = {},
-          },
-          n = {
-            select = '<cr>',
-            paste = 'p',
-            --- It is possible to map to more than one key.
-            -- paste = { 'p', '<c-p>' },
-            paste_behind = 'P',
-            replay = 'q',
-            delete = 'd',
-            edit = 'e',
-            custom = {},
-          },
-        },
-        fzf = {
-          select = 'default',
-          paste = 'ctrl-p',
-          paste_behind = 'ctrl-k',
-          custom = {},
-        },
-      },
-    })
-  end,
-}
+require('neoclip').setup({
+  history = 1000,
+  enable_persistent_history = false,
+  length_limit = 1048576,
+  continuous_sync = false,
+  db_path = vim.fn.stdpath("data") .. "/databases/neoclip.sqlite3",
+  filter = nil,
+  preview = true,
+  prompt = nil,
+  default_register = '"',
+  default_register_macros = 'q',
+  enable_macro_history = true,
+  content_spec_column = false,
+  disable_keycodes_parsing = false,
+  on_select = {
+	move_to_front = false,
+	close_telescope = true,
+  },
+  on_paste = {
+	set_reg = false,
+	move_to_front = false,
+	close_telescope = true,
+  },
+  on_replay = {
+	set_reg = false,
+	move_to_front = false,
+	close_telescope = true,
+  },
+  on_custom_action = {
+	close_telescope = true,
+  },
+  keys = {
+	telescope = {
+	  i = {
+		select = '<cr>',
+		paste = '<c-p>',
+		paste_behind = '<c-k>',
+		replay = '<c-q>',  -- replay a macro
+		delete = '<c-d>',  -- delete an entry
+		edit = '<c-e>',  -- edit an entry
+		custom = {},
+	  },
+	  n = {
+		select = '<cr>',
+		paste = 'p',
+		--- It is possible to map to more than one key.
+		-- paste = { 'p', '<c-p>' },
+		paste_behind = 'P',
+		replay = 'q',
+		delete = 'd',
+		edit = 'e',
+		custom = {},
+	  },
+	},
+	fzf = {
+	  select = 'default',
+	  paste = 'ctrl-p',
+	  paste_behind = 'ctrl-k',
+	  custom = {},
+	},
+  },
+})
+
 ```
 * `history`: The max number of entries to store (default 1000).
 * `enable_persistent_history`: If set to `true` the history is stored on `VimLeavePre` using [`sqlite.lua`](https://github.com/kkharji/sqlite.lua) and lazy loaded when querying.
