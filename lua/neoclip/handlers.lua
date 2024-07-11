@@ -91,8 +91,21 @@ end
 
 -- TODO can this be done without setting the register?
 M.paste = function(entry, op)
+    if op == "v" then
+      return M.paste_visual(entry)
+    end
+
     temporary_reg_usage(entry, function(register_name)
         vim.cmd(string.format('normal! "%s%s', register_name, op))
+    end)
+end
+
+M.paste_visual = function(entry)
+    temporary_reg_usage(entry, function(register_name)
+        -- `gv` is needed to reselect the last visual selection.
+        -- NOTE: This only works if the last visual selection was saved by
+        -- returing back to normal mode before opening neoclip.
+        vim.api.nvim_feedkeys('gv"'..register_name..'p', "n", false)
     end)
 end
 
