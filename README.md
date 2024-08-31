@@ -314,7 +314,7 @@ if using `telescope` or
 if using `fzf-lua`, which will replace register `a`.
 The register `[0-9a-z]` and `default` (`"`) are supported.
 
-The following special registers are support:
+The following special registers are supported:
 * `"`: `Telescope neoclip unnamed`
 * `*`: `Telescope neoclip star`
 * `+`: `Telescope neoclip plus`
