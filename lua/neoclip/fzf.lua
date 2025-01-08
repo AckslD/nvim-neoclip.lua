@@ -128,7 +128,7 @@ local function neoclip(register_names)
       previewer = Previewer,
       actions = actions,
       fzf_opts = {
-        ["--header"] = vim.fn.shellescape(picker_utils.make_prompt_title(register_names)),
+        ["--header"] = picker_utils.make_prompt_title(register_names),
         ["--delimiter"] = [[\.]],
         -- comment `--nth` if you want to enable
         -- fuzzy matching the index number
