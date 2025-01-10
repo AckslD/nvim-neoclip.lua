@@ -99,7 +99,7 @@ function Previewer:populate_preview_buf(entry_str)
   vim.api.nvim_buf_set_lines(tmpbuf, 0, -1, false, entry.contents)
   vim.api.nvim_buf_set_option(tmpbuf, 'filetype', entry.filetype)
   self:set_preview_buf(tmpbuf)
-  self.win:update_scrollbar()
+  self.win:update_preview_scrollbar()
 end
 
 -- this function feeds elements into fzf
