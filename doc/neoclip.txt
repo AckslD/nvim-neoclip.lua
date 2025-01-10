@@ -140,6 +140,7 @@ The following are the defaults and the keys are explained below:
                 select = '<cr>',
                 paste = '<c-p>',
                 paste_behind = '<c-k>',
+                paste_visual = '<c-v>',
                 replay = '<c-q>',  -- replay a macro
                 delete = '<c-d>',  -- delete an entry
                 edit = '<c-e>',  -- edit an entry
@@ -151,6 +152,7 @@ The following are the defaults and the keys are explained below:
                 --- It is possible to map to more than one key.
                 -- paste = { 'p', '<c-p>' },
                 paste_behind = 'P',
+                paste_visual = 'v',
                 replay = 'q',
                 delete = 'd',
                 edit = 'e',
@@ -161,6 +163,7 @@ The following are the defaults and the keys are explained below:
               select = 'default',
               paste = 'ctrl-p',
               paste_behind = 'ctrl-k',
+              paste_visual = 'ctrl-v',
               custom = {},
             },
           },
@@ -424,7 +427,7 @@ TIPS                                           *neoclip-nvim-neoclip.lua-tips*
         local function is_whitespace(line)
           return vim.fn.match(line, [[^\s*$]]) ~= -1
         end
-        
+
         local function all(tbl, check)
           for _, entry in ipairs(tbl) do
             if not check(entry) then
@@ -433,7 +436,7 @@ TIPS                                           *neoclip-nvim-neoclip.lua-tips*
           end
           return true
         end
-        
+
         require('neoclip').setup{
           ...
           filter = function(data)
@@ -484,10 +487,10 @@ PREVIEW = FALSE AND CONTENT_SPEC_COLUMN = FALSE ~
 2. Links                                                       *neoclip-links*
 
 1. *neoclip*: https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png
-2. *@cdown*: 
-3. *@fdschmidt93*: 
-4. *@ibhagwan*: 
-5. *@kkharji*: 
+2. *@cdown*:
+3. *@fdschmidt93*:
+4. *@ibhagwan*:
+5. *@kkharji*:
 6. *preview*: https://user-images.githubusercontent.com/23341710/140090515-83a08f0f-85f9-4278-bcbe-48e4d8442ace.png
 7. *content_spec_column*: https://user-images.githubusercontent.com/23341710/140090472-3271affa-7efd-40bd-9d20-562b2074b261.png
 8. *clean*: https://user-images.githubusercontent.com/23341710/140090327-30bfff28-83ff-4695-82b8-8d4abfd68546.png

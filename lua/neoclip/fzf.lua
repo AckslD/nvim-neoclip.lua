@@ -59,6 +59,7 @@ local function make_actions(register_names)
         [keys.select] = get_set_register_handler(register_names),
         [keys.paste] = get_paste_handler(register_names, 'p'),
         [keys.paste_behind] = get_paste_handler(register_names, 'P'),
+        [keys.paste_visual] = get_paste_handler(register_names, 'v'),
     }
     if keys.custom ~= nil then
         for key, action in pairs(keys.custom) do
