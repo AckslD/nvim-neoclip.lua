@@ -13,6 +13,7 @@ local settings = {
     enable_macro_history = true,
     content_spec_column = false,
     disable_keycodes_parsing = false,
+    picker_display_callback = nil,
     on_select = {
         move_to_front = false,
         close_telescope = true,

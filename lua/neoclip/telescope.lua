@@ -187,6 +187,11 @@ local function make_display(entry, typ)
     if settings.content_spec_column then
         table.insert(to_display, {spec_from_entry(entry), "Comment"})
     end
+
+    if settings.picker_display_callback then
+      to_display[1] = settings.picker_display_callback(to_display[1])
+    end
+
     return displayer(to_display)
 end
 
