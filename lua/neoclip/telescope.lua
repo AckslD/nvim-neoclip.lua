@@ -187,6 +187,11 @@ local function make_display(entry, typ)
     if settings.content_spec_column then
         table.insert(to_display, {spec_from_entry(entry), "Comment"})
     end
+
+    if settings.dedent_picker_display then
+      to_display[1] = picker_utils.dedent_picker_display(to_display[1])
+    end
+
     return displayer(to_display)
 end
 
