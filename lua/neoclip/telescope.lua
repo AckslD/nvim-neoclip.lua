@@ -286,6 +286,7 @@ local function get_export(register_names, typ)
 
         pickers.new(opts, {
             prompt_title = picker_utils.make_prompt_title(register_names),
+            initial_mode = settings.initial_mode,
             prompt_prefix = settings.prompt or nil,
             finder = finders.new_table({
                 results = results,
