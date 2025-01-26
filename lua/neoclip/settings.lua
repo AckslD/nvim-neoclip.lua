@@ -13,6 +13,7 @@ local settings = {
     enable_macro_history = true,
     content_spec_column = false,
     disable_keycodes_parsing = false,
+    dedent_picker_display = false,
     initial_mode = 'insert',
     on_select = {
         move_to_front = false,
