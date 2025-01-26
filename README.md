@@ -134,6 +134,7 @@ require('neoclip').setup({
   content_spec_column = false,
   disable_keycodes_parsing = false,
   dedent_picker_display = false,
+  initial_mode = 'insert',
   on_select = {
 	move_to_front = false,
 	close_telescope = true,
@@ -211,6 +212,7 @@ require('neoclip').setup({
 * `disable_keycodes_parsing`: If set to `true` (default `false`), macroscope will display the internal byte representation, instead of a proper string that can be used in a `map`. So a macro like "`one<CR>two`" will be displayed as "`one\ntwo`"
   It will only show the type and number of lines next to the first line of the entry.
 * `dedent_picker_display`: If `true` trim leading whitespace when displaying items in the picker (default `false`).
+* `initial_mode`: The mode in which to start the telescope picker, can be `insert` or `normal` (default `insert`).
 * `on_select`:
   * `move_to_front`: if the entry should be set to last in the list when pressing the key to select a yank.
   * `close_telescope`: if telescope should close whenever an item is selected.
