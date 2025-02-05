@@ -158,6 +158,7 @@ require('neoclip').setup({
 		select = '<cr>',
 		paste = '<c-p>',
 		paste_behind = '<c-k>',
+		paste_visual = '<c-v>',
 		replay = '<c-q>',  -- replay a macro
 		delete = '<c-d>',  -- delete an entry
 		edit = '<c-e>',  -- edit an entry
@@ -169,6 +170,7 @@ require('neoclip').setup({
 		--- It is possible to map to more than one key.
 		-- paste = { 'p', '<c-p>' },
 		paste_behind = 'P',
+		paste_visual = 'v',
 		replay = 'q',
 		delete = 'd',
 		edit = 'e',
@@ -179,6 +181,7 @@ require('neoclip').setup({
 	  select = 'default',
 	  paste = 'ctrl-p',
 	  paste_behind = 'ctrl-k',
+	  paste_visual = 'ctrl-v',
 	  custom = {},
 	},
   },
@@ -336,6 +339,16 @@ if using `telescope` or
 ```
 if using `fzf-lua`.
 
+### Visual mode
+
+If you want to select some text and replace it with a Neoclip selection, you need the following keymap for visual mode:
+
+```vim
+<ESC>:Telescope neoclip<CR>
+```
+
+The `<ESC>` is necessary to "save" the visual selection before opening a floating buffer. If not, the visual selection is lost. If we don't do this, there will be an error `E481: No range allowed` because Telescope does not support ranges (it seems). If the mapping were `<CMD>Telescope neoclip<CR>`, the visual range would be dropped before opening Telescope without being saved so the visual paste later on would be wrong.
+
 ### Macros
 If `enable_macro_history` is set to `true` (default) in the [`setup`](#configuration) then any recorded macro will be stored and can later be accessed using:
 ```vim
@@ -385,7 +398,7 @@ You can edit the contents of an entry using the keybinds for `edit`. It'll open 
     end
     return true
   end
-  
+
   require('neoclip').setup{
     ...
     filter = function(data)
