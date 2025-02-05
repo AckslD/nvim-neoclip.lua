@@ -267,6 +267,9 @@ local function get_export(register_names, typ)
                 end,
                 dyn_title = function(self, entry)
                     return spec_from_entry(entry)
+                end,
+                get_buffer_by_name = function(self, entry)
+                    return 'test'
                 end
             })
         end
