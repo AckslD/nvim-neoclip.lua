@@ -8,32 +8,21 @@ on:
     - cron: "0 0 * * *"
 
 jobs:
-  appimage-ubuntu:
-    name: Appimage-ubuntu
-    runs-on: ubuntu-20.04
+  unit_tests:
+    name: unit tests
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v2
-      - run: date +%F > todays-date
-      - name: Restore cache for today's nightly.
-        uses: actions/cache@v2
+      - uses: rhysd/action-setup-vim@v1
         with:
-          path: |
-            build
-          key: ${{ runner.os }}-appimage-${{ hashFiles('todays-date') }}
-
+          neovim: true
+          version: ${{ matrix.rev }}
       - name: Prepare
         run: |
-          test -d build || {
-            mkdir -p build
-            wget https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
-            chmod +x nvim.appimage
-            mv nvim.appimage ./build/nvim
-          }
           mkdir -p rtps
           git clone --depth 1 https://github.com/nvim-lua/plenary.nvim rtps/plenary.nvim
           git clone --depth 1 https://github.com/nvim-telescope/telescope.nvim rtps/telescope.nvim
           git clone --depth 1 https://github.com/kkharji/sqlite.lua.git rtps/sqlite.lua
       - name: Run tests
         run: |
-            export PATH="${PWD}/build/:${PATH}"
             make test
