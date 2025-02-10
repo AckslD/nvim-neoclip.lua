@@ -231,6 +231,10 @@ require('neoclip').setup({
   With `fzf-lua` only insert mode is supported and `fzf`-style key-syntax needs to be used.
   You can also use the `custom` entry to specify custom actions to take on certain key-presses, see [below](#custom-actions) for more details.
   NOTE: these are only set in the `telescope` buffer and you need to setup your own keybindings to for example open `telescope`.
+* `enable_system_clipboard`: if set to `true`, the content in register `*` and
+  `+` will be stored.
+  NOTE: clipboard provider need to set up correctly in neovim, see `:help clipboard` for
+  more details
 
 See screenshot section below for how the settings above might affect the looks.
 
